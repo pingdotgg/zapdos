@@ -18,6 +18,8 @@
     "@trpc/server": "^9.25.3",
     "next": "12.2.1",
     "next-auth": "^4.10.0",
+    "pusher": "^5.1.1-beta",
+    "pusher-js": "^7.1.1-beta",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-query": "^3.39.1",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "18.0.0",
+    "@types/pusher-js": "^5.1.0",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
     "autoprefixer": "^10.4.7",
