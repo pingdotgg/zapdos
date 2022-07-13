@@ -4,6 +4,18 @@ import { trpc } from "../utils/trpc";
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 
+const QuestionsView = () => {
+  const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
+
+  return (
+    <div className="flex flex-col">
+      {data?.map((q) => (
+        <div key={q.id}>{q.body}</div>
+      ))}
+    </div>
+  );
+};
+
 const HomeContents = () => {
   const { data, status } = useSession();
 
@@ -19,15 +31,13 @@ const HomeContents = () => {
 
   return (
     <div className="flex flex-col">
-      Hello {data.user?.name}
-      <button onClick={() => signOut()}>Sign Out</button>
+      Hello {data.user?.name} {data.user?.id}
+      <QuestionsView />
     </div>
   );
 };
 
 const Home: NextPage = () => {
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
-
   return (
     <>
       <Head>

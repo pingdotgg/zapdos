@@ -15,6 +15,14 @@ model Example {
     id String @id @default(cuid())
 }
 
+model Question {
+    id   String @id @default(cuid())
+    body String @db.Text
+
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id])
+}
+
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -50,6 +58,8 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+
+    Question Question[]
 }
 
 model VerificationToken {
