@@ -19,7 +19,7 @@ model Question {
     id   String @id @default(cuid())
     body String @db.Text
 
-    userId String @unique
+    userId String
     user   User   @relation(fields: [userId], references: [id])
 }
 
