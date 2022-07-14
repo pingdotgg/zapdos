@@ -12,10 +12,18 @@ const QuestionsView = () => {
   ]);
 
   return (
-    <div className="flex flex-col">
-      <button onClick={() => unpinQuestion()}>Unpin current question</button>
+    <div className="flex flex-col gap-4">
+      <button
+        onClick={() => unpinQuestion()}
+        className="absolute top-0 right-0 m-4"
+      >
+        Unpin current question
+      </button>
       {data?.map((q) => (
-        <div key={q.id}>
+        <div
+          key={q.id}
+          className="p-4 bg-gray-600 rounded flex justify-between"
+        >
           {q.body}
           <button onClick={() => pinQuestion({ questionId: q.id })}>Pin</button>
         </div>
@@ -38,8 +46,8 @@ const HomeContents = () => {
     );
 
   return (
-    <div className="flex flex-col">
-      Hello {data.user?.name} {data.user?.id}
+    <div className="flex flex-col p-8">
+      Hello {data.user?.name}
       <QuestionsView />
     </div>
   );
