@@ -22,6 +22,7 @@
     "pusher-js": "^7.1.1-beta",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-icons": "^4.4.0",
     "react-query": "^3.39.1",
     "superjson": "^1.9.1",
     "zod": "^3.17.3"
