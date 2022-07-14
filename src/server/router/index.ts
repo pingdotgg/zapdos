@@ -1,12 +1,10 @@
 // src/server/router/index.ts
-import { createRouter } from "./utils/context";
-import superjson from "superjson";
+import { newQuestionRouter } from "./subroutes/question";
+import { t } from "./trpc";
 
-import { questionRouter } from "./subroutes/question";
-
-export const appRouter = createRouter()
-  .transformer(superjson)
-  .merge("questions.", questionRouter);
+export const appRouter = t.router({
+  questions: newQuestionRouter,
+});
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
