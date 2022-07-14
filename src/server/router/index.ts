@@ -1,12 +1,17 @@
 // src/server/router/index.ts
 import { createRouter } from "./utils/context";
-import superjson from "superjson";
-
 import { questionRouter } from "./subroutes/question";
+import { t } from "./trpc";
 
-export const appRouter = createRouter()
-  .transformer(superjson)
-  .merge("questions.", questionRouter);
+const legacyAppRouter = createRouter()
+  .merge("questions.", questionRouter)
+  .interop();
+
+const greetingRouter = t.router({
+  greeting: t.procedure.query(() => "world"),
+});
+
+export const appRouter = t.mergeRouters(legacyAppRouter, greetingRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
