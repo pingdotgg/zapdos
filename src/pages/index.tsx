@@ -7,9 +7,13 @@ const QuestionsView = () => {
   const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
 
   const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
+  const { mutate: unpinQuestion } = trpc.useMutation([
+    "questions.unpin-question",
+  ]);
 
   return (
     <div className="flex flex-col">
+      <button onClick={() => unpinQuestion()}>Unpin current question</button>
       {data?.map((q) => (
         <div key={q.id}>
           {q.body}

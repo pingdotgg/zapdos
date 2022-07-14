@@ -70,8 +70,6 @@ export const questionRouter = createRouter()
         where: { id: input.questionId },
       });
 
-      console.log("we found the q!", question);
-
       if (!question || question.userId !== ctx.session.user.id) {
         throw new TRPCError({
           message: "NOT YOUR QUESTION",
@@ -91,5 +89,21 @@ export const questionRouter = createRouter()
       console.log("we sent the q!", question);
 
       return question;
+    },
+  })
+  .mutation("unpin-question", {
+    async resolve({ ctx }) {
+      if (!ctx.session || !ctx.session.user?.id) {
+        throw new TRPCError({
+          message: "You are not signed in",
+          code: "UNAUTHORIZED",
+        });
+      }
+
+      await pusherServerClient.trigger(
+        `user-${ctx.session.user?.id}`,
+        "question-unpinned",
+        {}
+      );
     },
   });
