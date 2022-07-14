@@ -11,7 +11,7 @@ import type { User } from "@prisma/client";
 
 const AskForm = (props: { user: User }) => {
   if (!props.user) throw new Error("user exists Next, sorry");
-  const { mutate } = trpc.useMutation("questions.submit-question");
+  const { mutate } = trpc.proxy.questions.submit.useMutation();
   const [question, setQuestion] = useState("");
 
   return (

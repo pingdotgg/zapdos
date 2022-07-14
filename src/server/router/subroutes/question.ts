@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import PusherServer from "pusher";
 import { env } from "../../env";
 import { createProtectedRouter } from "../utils/protected-router";
+import { t } from "../trpc";
 
 const pusherServerClient = new PusherServer({
   appId: env.PUSHER_APP_ID!,
@@ -82,6 +83,26 @@ const privateQuestionRouter = createProtectedRouter()
     },
   });
 
-export const questionRouter = createRouter()
+export const legacyQuestionRouter = createRouter()
   .merge(publicQuestionRouter)
   .merge(privateQuestionRouter);
+
+export const newQuestionRouter = t.router({
+  submit: t.procedure
+    .input(
+      z.object({
+        userId: z.string(),
+        question: z.string().min(0).max(400),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const question = await ctx.prisma.question.create({
+        data: {
+          userId: input.userId,
+          body: input.question,
+        },
+      });
+
+      return question;
+    }),
+});

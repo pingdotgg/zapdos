@@ -2,9 +2,10 @@ import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
 import { Session } from "next-auth";
 import { getZapdosAuthSession } from "../../common/get-server-session";
-
+import { prisma } from "../../db/client";
 interface CreateContextOptions {
   session: Session | null;
+  prisma: typeof prisma;
 }
 
 /**
@@ -12,7 +13,7 @@ interface CreateContextOptions {
  * This is useful for testing when we don't want to mock Next.js' request/response
  */
 export async function createContextInner(opts: CreateContextOptions) {
-  return { session: opts.session };
+  return { session: opts.session, prisma };
 }
 
 export type Context = trpc.inferAsyncReturnType<typeof createContextInner>;
@@ -31,5 +32,5 @@ export async function createContext(
 
   const session = req && res && (await getZapdosAuthSession({ req, res }));
 
-  return await createContextInner({ session });
+  return await createContextInner({ session, prisma });
 }

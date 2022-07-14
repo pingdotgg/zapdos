@@ -1,17 +1,17 @@
 // src/server/router/index.ts
 import { createRouter } from "./utils/context";
-import { questionRouter } from "./subroutes/question";
+import { legacyQuestionRouter, newQuestionRouter } from "./subroutes/question";
 import { t } from "./trpc";
 
 const legacyAppRouter = createRouter()
-  .merge("questions.", questionRouter)
+  .merge("questions.", legacyQuestionRouter)
   .interop();
 
-const greetingRouter = t.router({
-  greeting: t.procedure.query(() => "world"),
+const primaryRouter = t.router({
+  questions: newQuestionRouter,
 });
 
-export const appRouter = t.mergeRouters(legacyAppRouter, greetingRouter);
+export const appRouter = t.mergeRouters(legacyAppRouter, primaryRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
