@@ -1,13 +1,15 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import {
+  GetServerSidePropsContext,
+  GetStaticProps,
+  InferGetServerSidePropsType,
+} from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { prisma } from "../../server/db/client";
+import type { User } from "@prisma/client";
 
-const AskForm = (
-  props: InferGetServerSidePropsType<typeof getServerSideProps>
-) => {
+const AskForm = (props: { user: User }) => {
   if (!props.user) throw new Error("user exists Next, sorry");
   const { mutate } = trpc.useMutation("questions.submit-question");
   const [question, setQuestion] = useState("");
@@ -59,21 +61,24 @@ const AskForm = (
   );
 };
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { query } = ctx;
-  if (!query.uid || typeof query.uid !== "string") {
-    return { props: {}, redirect: { pathname: "/" } };
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  if (!params || !params.uid || typeof params.uid !== "string") {
+    return { props: {}, redirect: { pathname: "/" }, revalidate: 0 };
   }
 
-  const userId = query.uid;
+  const userId = params.uid;
 
   const userInfo = await prisma.user.findFirst({ where: { id: userId } });
 
   if (!userInfo) {
-    return { props: {}, redirect: { pathname: "/" } };
+    return { props: {}, redirect: { pathname: "/" }, revalidate: 0 };
   }
 
-  return { props: { user: userInfo } };
+  return { props: { user: userInfo }, revalidate: 60 };
 };
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: "blocking" };
+}
 
 export default AskForm;
