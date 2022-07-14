@@ -4,9 +4,6 @@ import { trpc } from "../utils/trpc";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import LoadingSpinnerSVG from "../assets/puff.svg";
-import Image from "next/image";
-
 const copyUrlToClipboard = (path: string) => () => {
   if (!process.browser) return;
   navigator.clipboard.writeText(`${window.location.origin}${path}`);
@@ -32,11 +29,9 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
 };
 
 const QuestionsView = () => {
-  const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
+  const { data } = trpc.useQuery(["questions.get-my-questions"]);
 
   const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
-
-  if (isLoading) return <Image src={LoadingSpinnerSVG} alt={"Loading..."} />;
 
   return (
     <div className="flex flex-col gap-4 animate-fade-in-down">
@@ -54,9 +49,7 @@ const QuestionsView = () => {
 };
 
 const HomeContents = () => {
-  const { data, status } = useSession();
-
-  if (status === "loading") return <div>Loading...</div>;
+  const { data } = useSession();
 
   if (!data)
     return (
