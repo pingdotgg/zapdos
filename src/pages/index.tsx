@@ -27,7 +27,7 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
       >
         Copy Q&A url
       </button>
-      <button onClick={() => unpinQuestion}>Unpin</button>
+      <button onClick={() => unpinQuestion()}>Unpin</button>
       <button onClick={() => signOut()}>Logout</button>
     </div>
   );
