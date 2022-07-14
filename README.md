@@ -13,7 +13,7 @@ Bad q&a app
 - [ ] Ability to filter "answered" questions
 - [x] "Copy form link" button
 - [x] "Copy OBS embed link" button
-- [ ] Create "protected router" for authed parts
-- [ ] Redo router structure
+- [x] Create "protected router" for authed parts
+- [x] Redo router structure
 - [x] Maybe SSR some things? Idk
 - [ ] Delete question
