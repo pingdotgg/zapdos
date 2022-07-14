@@ -13,9 +13,7 @@ const copyUrlToClipboard = (path: string) => () => {
 
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: sesh } = useSession();
-  const { mutate: unpinQuestion } = trpc.useMutation([
-    "questions.unpin-question",
-  ]);
+  const { mutate: unpinQuestion } = trpc.proxy.questions.unpin.useMutation();
 
   return (
     <div className="flex gap-2">
@@ -48,9 +46,9 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
 };
 
 const QuestionsView = () => {
-  const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
+  const { data, isLoading } = trpc.proxy.questions.getAll.useQuery();
 
-  const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
+  const { mutate: pinQuestion } = trpc.proxy.questions.pin.useMutation();
 
   if (isLoading) return null;
 
