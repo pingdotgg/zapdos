@@ -3,22 +3,43 @@ import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-const QuestionsView = () => {
-  const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
-
-  const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
+const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { mutate: unpinQuestion } = trpc.useMutation([
     "questions.unpin-question",
   ]);
 
+  const copyTextToClipboardFactory = (text: string) => () =>
+    navigator.clipboard.writeText(text);
+
+  return (
+    <div className="flex gap-2">
+      <button
+        onClick={copyTextToClipboardFactory(
+          `${window.location.origin}/embed/${userId}`
+        )}
+      >
+        Copy embed url
+      </button>
+      <button
+        onClick={copyTextToClipboardFactory(
+          `${window.location.origin}/ask/${userId}`
+        )}
+      >
+        Copy Q&A url
+      </button>
+      <button onClick={() => unpinQuestion}>Unpin</button>
+      <button onClick={() => signOut()}>Logout</button>
+    </div>
+  );
+};
+
+const QuestionsView = () => {
+  const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
+
+  const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
+
   return (
     <div className="flex flex-col gap-4">
-      <button
-        onClick={() => unpinQuestion()}
-        className="absolute top-0 right-0 m-4"
-      >
-        Unpin current question
-      </button>
       {data?.map((q) => (
         <div
           key={q.id}
@@ -47,7 +68,10 @@ const HomeContents = () => {
 
   return (
     <div className="flex flex-col p-8">
-      Hello {data.user?.name}
+      <div className="flex justify-between w-full">
+        <h1 className="text-2xl font-bold">Questions For {data.user?.name}</h1>
+        <NavButtons userId={data.user?.id!} />
+      </div>
       <QuestionsView />
     </div>
   );
