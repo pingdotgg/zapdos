@@ -37,6 +37,7 @@ const privateQuestionRouter = createProtectedRouter()
         where: {
           userId: ctx.session.user.id,
         },
+        orderBy: { id: "desc" },
       });
 
       return questions;
