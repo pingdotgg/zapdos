@@ -20,8 +20,8 @@ const AskForm: React.FC<{ userId: string }> = ({ userId }) => {
       <Head>
         <title>Ask {data?.name} a question!</title>
       </Head>
-      <div className="flex flex-col items-center text-center">
-        <div className="flex flex-col p-8 items-center bg-gray-900 border-2 w-full md:w-96 m-8">
+      <div className="flex flex-col items-center text-center p-8">
+        <div className="flex flex-col p-8 items-center bg-gray-900 border-2 w-full">
           <h1 className="text-2xl font-bold">Ask {data?.name} a question!</h1>
           <h2>And someone pls make this page less ugly</h2>
 
