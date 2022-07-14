@@ -16,3 +16,4 @@ Bad q&a app
 - [ ] Create "protected router" for authed parts
 - [ ] Redo router structure
 - [ ] Maybe SSR some things? Idk
+- [ ] Delete question

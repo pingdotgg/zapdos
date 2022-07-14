@@ -1,30 +1,28 @@
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { getZapdosAuthSession } from "../server/common/get-server-session";
+
+import LoadingSpinnerSVG from "../assets/puff.svg";
+import Image from "next/image";
+
+const copyUrlToClipboard = (path: string) => () => {
+  if (!process.browser) return;
+  navigator.clipboard.writeText(`${window.location.origin}${path}`);
+};
 
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { mutate: unpinQuestion } = trpc.useMutation([
     "questions.unpin-question",
   ]);
 
-  const copyTextToClipboardFactory = (text: string) => () =>
-    navigator.clipboard.writeText(text);
-
   return (
     <div className="flex gap-2">
-      <button
-        onClick={copyTextToClipboardFactory(
-          `${window.location.origin}/embed/${userId}`
-        )}
-      >
+      <button onClick={copyUrlToClipboard(`/embed/${userId}`)}>
         Copy embed url
       </button>
-      <button
-        onClick={copyTextToClipboardFactory(
-          `${window.location.origin}/ask/${userId}`
-        )}
-      >
+      <button onClick={copyUrlToClipboard(`/ask/${userId}`)}>
         Copy Q&A url
       </button>
       <button onClick={() => unpinQuestion()}>Unpin</button>
@@ -38,8 +36,10 @@ const QuestionsView = () => {
 
   const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
 
+  if (isLoading) return <Image src={LoadingSpinnerSVG} alt={"Loading..."} />;
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 animate-fade-in-down">
       {data?.map((q) => (
         <div
           key={q.id}
@@ -72,6 +72,7 @@ const HomeContents = () => {
         <h1 className="text-2xl font-bold">Questions For {data.user?.name}</h1>
         <NavButtons userId={data.user?.id!} />
       </div>
+      <div className="p-4" />
       <QuestionsView />
     </div>
   );
@@ -89,6 +90,14 @@ const Home: NextPage = () => {
       <HomeContents />
     </>
   );
+};
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  return {
+    props: {
+      session: await getZapdosAuthSession(ctx),
+    },
+  };
 };
 
 export default Home;
