@@ -4,15 +4,15 @@ Bad q&a app
 
 ## TODO
 
-- [ ] "remove pin" button
+- [x] "remove pin" button
 - [ ] Pin persistence?
 - [ ] Better question asking form
 - [ ] Better url "slugs" for submitting questions
-- [ ] An actual UI
+- [x] An actual UI
 - [ ] Better responsiveness for question view
 - [ ] Ability to filter "answered" questions
-- [ ] "Copy form link" button
-- [ ] "Copy OBS embed link" button
+- [x] "Copy form link" button
+- [x] "Copy OBS embed link" button
 - [ ] Create "protected router" for authed parts
 - [ ] Redo router structure
 - [ ] Maybe SSR some things? Idk
