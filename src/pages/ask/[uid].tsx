@@ -63,7 +63,9 @@ const AskForm = (props: { user: User }) => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (!params || !params.uid || typeof params.uid !== "string") {
-    return { props: {}, redirect: { pathname: "/" }, revalidate: 0 };
+    return {
+      notFound: true,
+    };
   }
 
   const userId = params.uid;
@@ -71,7 +73,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const userInfo = await prisma.user.findFirst({ where: { id: userId } });
 
   if (!userInfo) {
-    return { props: {}, redirect: { pathname: "/" }, revalidate: 0 };
+    return {
+      notFound: true,
+    };
   }
 
   return { props: { user: userInfo }, revalidate: 60 };
