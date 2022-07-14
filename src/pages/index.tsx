@@ -47,9 +47,11 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
 };
 
 const QuestionsView = () => {
-  const { data } = trpc.useQuery(["questions.get-my-questions"]);
+  const { data, isLoading } = trpc.useQuery(["questions.get-my-questions"]);
 
   const { mutate: pinQuestion } = trpc.useMutation(["questions.pin-question"]);
+
+  if (isLoading) return null;
 
   return (
     <div className="flex flex-col gap-4 animate-fade-in-down">
@@ -87,7 +89,7 @@ const HomeContents = () => {
             <img
               src={data.user?.image}
               alt="pro pic"
-              className="rounded-full h-24"
+              className="rounded-full w-24"
             />
           )}
           {data.user?.name}
