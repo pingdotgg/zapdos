@@ -43,7 +43,7 @@ const BrowserEmbedView: React.FC<{ userId: string }> = ({ userId }) => {
   return (
     <div className="w-screen h-screen flex justify-center items-center">
       {" "}
-      <div className="p-8 bg-gray-800 text-white rounded shadow">
+      <div className="p-8 bg-gray-900/70 text-white rounded shadow border-2 w-full text-center text-2xl">
         {latestMessage}
       </div>
     </div>
