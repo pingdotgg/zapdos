@@ -12,6 +12,7 @@ const copyUrlToClipboard = (path: string) => () => {
 };
 
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
+  const { data: sesh } = useSession();
   const { mutate: unpinQuestion } = trpc.useMutation([
     "questions.unpin-question",
   ]);
@@ -31,7 +32,7 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
         Copy embed url <FaCopy size={24} />
       </button>
       <button
-        onClick={copyUrlToClipboard(`/ask/${userId}`)}
+        onClick={copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`)}
         className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
       >
         Copy Q&A url <FaCopy size={24} />

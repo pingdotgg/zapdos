@@ -62,15 +62,16 @@ const AskForm = (props: { user: User }) => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  if (!params || !params.uid || typeof params.uid !== "string") {
+  if (!params || !params.username || typeof params.username !== "string") {
     return {
       notFound: true,
     };
   }
+  const twitchName = params.username.toLowerCase();
 
-  const userId = params.uid;
-
-  const userInfo = await prisma.user.findFirst({ where: { id: userId } });
+  const userInfo = await prisma.user.findFirst({
+    where: { name: { equals: twitchName, mode: "insensitive" } },
+  });
 
   if (!userInfo) {
     return {
