@@ -14,9 +14,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-
-    // TODO: Set to "true" when fixed in tRPC
-    "noUncheckedIndexedAccess": false
+    "noUncheckedIndexedAccess": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
   "exclude": ["node_modules"]
