@@ -17,30 +17,23 @@ interface PusherZustandStore {
 
   members: { [key: string]: any };
 }
-let bindingCount = 0;
-let pusherClient: Pusher;
+let store: StoreApi<PusherZustandStore>;
 const createPusherStore = (slug: string, publishPresence?: boolean) => {
-  console.log("\n\n\n WAS THIS DONE TWICE???");
-  const tempId = "temp-id" + Math.random().toFixed(7);
-  bindingCount++;
-  if (!pusherClient) {
-    pusherClient = new Pusher(pusher_key, {
-      // wsHost: "zback-production.up.railway.app",
-      // forceTLS: true,
-      // disableStats: true,
-      enabledTransports: ["ws", "wss"],
-      authEndpoint: "/api/pusher/auth-channel",
-      auth: {
-        headers: { user_id: tempId },
-      },
-
-      cluster: "us3",
-    });
+  if (store) {
+    console.log("fuck you react I win");
+    return store;
   }
-  console.log("CREATING WITH ID", tempId, "BINDING COUNT", bindingCount);
-  // pusherClient.signin();
+  const tempId = "temp-id" + Math.random().toFixed(7);
+  const pusherClient = new Pusher(pusher_key, {
+    enabledTransports: ["ws", "wss"],
+    authEndpoint: "/api/pusher/auth-channel",
+    auth: {
+      headers: { user_id: tempId },
+    },
 
-  // const channel = pusherClient.subscribe(slug);
+    cluster: "us3",
+  });
+  const channel = pusherClient.subscribe(slug);
 
   const presenceChannel = pusherClient.subscribe(
     `presence-${slug}`
@@ -70,7 +63,9 @@ const createPusherStore = (slug: string, publishPresence?: boolean) => {
   presenceChannel.bind("pusher:member_added", updateMembers);
   presenceChannel.bind("pusher:member_removed", updateMembers);
 
-  return reactZustandCreate(newStore);
+  store = newStore;
+
+  return newStore;
 };
 
 /**
@@ -92,7 +87,9 @@ export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
   return (
-    <PusherZustandStoreProvider createStore={() => createPusherStore(slug)}>
+    <PusherZustandStoreProvider
+      createStore={() => reactZustandCreate(createPusherStore(slug))}
+    >
       {children}
     </PusherZustandStoreProvider>
   );
