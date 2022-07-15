@@ -22,19 +22,19 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
     <div className="flex gap-2">
       <button
         onClick={copyUrlToClipboard(`/embed/${userId}`)}
-        className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
+        className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
       >
         Copy embed url <FaCopy size={24} />
       </button>
       <button
         onClick={copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`)}
-        className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
+        className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
       >
         Copy Q&A url <FaCopy size={24} />
       </button>
       <button
         onClick={() => signOut()}
-        className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
+        className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
       >
         Logout <FaSignOutAlt size={24} />
       </button>
@@ -47,12 +47,12 @@ const HomeContents = () => {
 
   if (!data)
     return (
-      <div className="w-screen h-screen flex flex-col items-center justify-center">
+      <div className="flex h-screen w-screen flex-col items-center justify-center">
         <div className="text-2xl font-bold">Please log in below</div>
         <div className="p-4" />
         <button
           onClick={() => signIn("twitch")}
-          className="bg-gray-200 rounded text-black px-4 py-2 flex items-center gap-2 text-2xl"
+          className="flex items-center gap-2 rounded bg-gray-200 px-4 py-2 text-2xl text-black"
         >
           <span>Sign in with Twitch</span>
           <FaTwitch />
@@ -62,13 +62,13 @@ const HomeContents = () => {
 
   return (
     <div className="flex flex-col p-8">
-      <div className="flex justify-between w-full items-center">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+      <div className="flex w-full items-center justify-between">
+        <h1 className="flex items-center gap-2 text-2xl font-bold">
           {data.user?.image && (
             <img
               src={data.user?.image}
               alt="pro pic"
-              className="rounded-full w-16"
+              className="w-16 rounded-full"
             />
           )}
           {data.user?.name}

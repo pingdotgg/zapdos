@@ -19,12 +19,12 @@ const AskForm = (props: { user: User }) => {
       <Head>
         <title>Ask {props.user?.name} a question!</title>
       </Head>
-      <div className="flex flex-col items-center text-center p-8">
-        <div className="flex flex-col p-8 items-center bg-gray-900 border-2 w-full">
+      <div className="flex flex-col items-center p-8 text-center">
+        <div className="flex w-full flex-col items-center border-2 bg-gray-900 p-8">
           {props.user.image && (
             <img
               src={props.user.image}
-              className="w-28 h-28 rounded-full"
+              className="h-28 w-28 rounded-full"
               alt="Pro pic"
             />
           )}
@@ -37,14 +37,14 @@ const AskForm = (props: { user: User }) => {
 
           <input
             placeholder="Question"
-            className="p-1 px-2 w-full text-gray-800"
+            className="w-full p-1 px-2 text-gray-800"
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
           <div className="p-2" />
           <button
-            className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
+            className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
             onClick={() => {
               if (!question) return;
 

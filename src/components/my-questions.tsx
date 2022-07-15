@@ -48,7 +48,7 @@ export const QuestionsView = () => {
       {data?.map((q) => (
         <div
           key={q.id}
-          className="p-4 bg-gray-600 rounded flex justify-between animate-fade-in-down"
+          className="flex animate-fade-in-down justify-between rounded bg-gray-600 p-4"
         >
           {q.body}
           <div className="flex gap-4">

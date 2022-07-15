@@ -18,8 +18,8 @@ const BrowserEmbedViewCore: React.FC<{ userId: string }> = ({ userId }) => {
   if (!latestMessage) return null;
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
-      <div className="p-8 bg-gray-900/70 text-white rounded shadow border-2 w-full text-center text-2xl">
+    <div className="flex h-screen w-screen items-center justify-center">
+      <div className="w-full rounded border-2 bg-gray-900/70 p-8 text-center text-2xl text-white shadow">
         {latestMessage}
       </div>
     </div>
