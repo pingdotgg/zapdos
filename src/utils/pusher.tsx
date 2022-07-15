@@ -16,7 +16,10 @@ interface PusherZustandStore {
 }
 const createPusherStore = (slug: string) => {
   const pusherClient = new Pusher(pusher_key, {
-    cluster: "us3",
+    wsHost: "zback-production.up.railway.app",
+    forceTLS: true,
+    disableStats: true,
+    enabledTransports: ["ws", "wss"],
   });
 
   const channel = pusherClient.subscribe(slug);
