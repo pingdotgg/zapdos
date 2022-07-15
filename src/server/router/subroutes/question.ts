@@ -29,6 +29,12 @@ export const newQuestionRouter = t.router({
         },
       });
 
+      await pusherServerClient.trigger(
+        `user-${input.userId}`,
+        "new-question",
+        {}
+      );
+
       return question;
     }),
 

@@ -4,7 +4,12 @@ import { trpc } from "../utils/trpc";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaEye, FaEyeSlash, FaCopy, FaSignOutAlt } from "react-icons/fa";
+import { FaEyeSlash, FaCopy, FaSignOutAlt } from "react-icons/fa";
+import dynamic from "next/dynamic";
+
+const LazyQuestionsView = dynamic(() => import("../components/my-questions"), {
+  ssr: false,
+});
 
 const copyUrlToClipboard = (path: string) => () => {
   if (!process.browser) return;
@@ -45,30 +50,6 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   );
 };
 
-const QuestionsView = () => {
-  const { data, isLoading } = trpc.proxy.questions.getAll.useQuery();
-
-  const { mutate: pinQuestion } = trpc.proxy.questions.pin.useMutation();
-
-  if (isLoading) return null;
-
-  return (
-    <div className="flex flex-col gap-4 animate-fade-in-down">
-      {data?.map((q) => (
-        <div
-          key={q.id}
-          className="p-4 bg-gray-600 rounded flex justify-between"
-        >
-          {q.body}
-          <button onClick={() => pinQuestion({ questionId: q.id })}>
-            <FaEye size={24} />
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const HomeContents = () => {
   const { data } = useSession();
 
@@ -96,7 +77,7 @@ const HomeContents = () => {
         <NavButtons userId={data.user?.id!} />
       </div>
       <div className="p-4" />
-      <QuestionsView />
+      <LazyQuestionsView />
     </div>
   );
 };
