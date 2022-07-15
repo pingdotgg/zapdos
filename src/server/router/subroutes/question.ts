@@ -72,6 +72,14 @@ export const newQuestionRouter = t.router({
       return question;
     }),
 
+  remove: protectedProcedure
+    .input(z.object({ questionId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.question.deleteMany({
+        where: { id: input.questionId, userId: ctx.session.user.id },
+      });
+    }),
+
   unpin: protectedProcedure.mutation(async ({ ctx }) => {
     await pusherServerClient.trigger(
       `user-${ctx.session.user?.id}`,
