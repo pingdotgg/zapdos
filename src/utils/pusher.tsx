@@ -8,7 +8,6 @@ import reactZustandCreate from "zustand";
 import vanillaCreate, { StoreApi } from "zustand/vanilla";
 
 const pusher_key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY!;
-Pusher.logToConsole = true;
 
 interface PusherZustandStore {
   pusherClient: Pusher;
@@ -17,12 +16,7 @@ interface PusherZustandStore {
 
   members: { [key: string]: any };
 }
-let store: StoreApi<PusherZustandStore>;
 const createPusherStore = (slug: string, publishPresence?: boolean) => {
-  if (store) {
-    console.log("fuck you react I win");
-    return store;
-  }
   const tempId = "temp-id" + Math.random().toFixed(7);
   const pusherClient = new Pusher(pusher_key, {
     enabledTransports: ["ws", "wss"],
@@ -44,7 +38,7 @@ const createPusherStore = (slug: string, publishPresence?: boolean) => {
   const newStore = vanillaCreate<PusherZustandStore>((set) => {
     return {
       pusherClient: pusherClient,
-      channel: presenceChannel,
+      channel: channel,
       presenceChannel,
 
       members: {},
@@ -63,8 +57,6 @@ const createPusherStore = (slug: string, publishPresence?: boolean) => {
   presenceChannel.bind("pusher:member_added", updateMembers);
   presenceChannel.bind("pusher:member_removed", updateMembers);
 
-  store = newStore;
-
   return newStore;
 };
 
@@ -78,6 +70,31 @@ const { Provider: PusherZustandStoreProvider, useStore: usePusherStore } =
   createContext<StoreApi<PusherZustandStore>>();
 
 import React from "react";
+
+// let erroneousRuns = -1;
+// const React18Woes = () => {
+//   const runs = React.useMemo(() => {
+//     erroneousRuns++;
+//     console.log("Number of runs (>0 is bad)", erroneousRuns);
+//     return erroneousRuns;
+//   }, []);
+
+//   return <div>{runs}</div>;
+// };
+
+let erroneousRuns = -1;
+const React18Woes = () => {
+  const [runs] = React.useState(
+    (() => {
+      erroneousRuns++;
+      console.log("Number of runs (>0 is bad)", erroneousRuns);
+      return erroneousRuns;
+    })()
+  );
+
+  return <div>{runs}</div>;
+};
+
 /**
  * This provider is the thing you mount in the app to "give access to Pusher"
  *
@@ -86,10 +103,20 @@ import React from "react";
 export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
+  const [store, setStore] = React.useState<StoreApi<PusherZustandStore>>();
+
+  React.useEffect(() => {
+    const newStore = createPusherStore(slug);
+    setStore(newStore);
+    return () => {
+      newStore.getState().pusherClient.disconnect();
+    };
+  }, [slug]);
+
+  if (!store) return <div />;
+
   return (
-    <PusherZustandStoreProvider
-      createStore={() => reactZustandCreate(createPusherStore(slug))}
-    >
+    <PusherZustandStoreProvider createStore={() => reactZustandCreate(store)}>
       {children}
     </PusherZustandStoreProvider>
   );
