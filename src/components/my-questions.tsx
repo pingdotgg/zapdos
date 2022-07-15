@@ -34,14 +34,22 @@ export const QuestionsView = () => {
     setCurrentlyPinnedQuestion(undefined);
   };
 
+  const tctx = trpc.useContext();
+
   const { mutate: removeQuestionMutation } =
-    trpc.proxy.questions.archive.useMutation({
-      onSuccess: () => {
-        refetch();
-      },
-    });
+    trpc.proxy.questions.archive.useMutation();
+
   const removeQuestion = (questionId: string) => {
+    // Optimistic update
+    tctx.queryClient.setQueryData(
+      ["questions.getAll", null],
+      data?.filter((q) => q.id !== questionId)
+    );
+
+    // Mutation to archive question
     removeQuestionMutation({ questionId });
+
+    // Unpin if this one was pinned
     if (questionId === currentlyPinned) unpinQuestion();
   };
 
