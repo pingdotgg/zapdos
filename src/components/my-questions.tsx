@@ -1,6 +1,6 @@
 import { trpc } from "../utils/trpc";
 
-import { FaEye, FaEyeSlash, FaTimes } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaArchive } from "react-icons/fa";
 import { PusherProvider, useSubscribeToEvent } from "../utils/pusher";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -35,7 +35,7 @@ export const QuestionsView = () => {
   };
 
   const { mutate: removeQuestionMutation } =
-    trpc.proxy.questions.remove.useMutation({
+    trpc.proxy.questions.archive.useMutation({
       onSuccess: () => {
         refetch();
       },
@@ -68,7 +68,7 @@ export const QuestionsView = () => {
                 </button>
               )}
               <button onClick={() => removeQuestion(q.id)}>
-                <FaTimes size={24} />
+                <FaArchive size={24} />
               </button>
             </div>
           </div>
