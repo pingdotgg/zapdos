@@ -9,6 +9,9 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
+import LoadingSVG from "../assets/puff.svg";
+import Image from "next/image";
+
 export const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
   // Refetch when new questions come through
@@ -53,7 +56,12 @@ export const QuestionsView = () => {
     if (questionId === currentlyPinned) unpinQuestion();
   };
 
-  if (isLoading) return null;
+  if (isLoading)
+    return (
+      <div className="flex animate-fade-in-delay justify-center p-8">
+        <Image src={LoadingSVG} alt="loading..." width={200} height={200} />
+      </div>
+    );
 
   return (
     <div className="flex flex-wrap justify-center gap-4 p-8">
