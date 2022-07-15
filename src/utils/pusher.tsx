@@ -3,7 +3,7 @@
  *
  * This defines a Pusher client and channel connection as a vanilla Zustand store.
  */
-import Pusher, { Channel } from "pusher-js";
+import Pusher, { Channel, PresenceChannel } from "pusher-js";
 import reactZustandCreate from "zustand";
 import vanillaCreate, { StoreApi } from "zustand/vanilla";
 
@@ -13,22 +13,62 @@ Pusher.logToConsole = true;
 interface PusherZustandStore {
   pusherClient: Pusher;
   channel: Channel;
-}
-const createPusherStore = (slug: string) => {
-  const pusherClient = new Pusher(pusher_key, {
-    wsHost: "zback-production.up.railway.app",
-    forceTLS: true,
-    disableStats: true,
-    enabledTransports: ["ws", "wss"],
-  });
+  presenceChannel: PresenceChannel;
 
-  const channel = pusherClient.subscribe(slug);
+  members: { [key: string]: any };
+}
+let bindingCount = 0;
+let pusherClient: Pusher;
+const createPusherStore = (slug: string, publishPresence?: boolean) => {
+  console.log("\n\n\n WAS THIS DONE TWICE???");
+  const tempId = "temp-id" + Math.random().toFixed(7);
+  bindingCount++;
+  if (!pusherClient) {
+    pusherClient = new Pusher(pusher_key, {
+      // wsHost: "zback-production.up.railway.app",
+      // forceTLS: true,
+      // disableStats: true,
+      enabledTransports: ["ws", "wss"],
+      authEndpoint: "/api/pusher/auth-channel",
+      auth: {
+        headers: { user_id: tempId },
+      },
+
+      cluster: "us3",
+    });
+  }
+  console.log("CREATING WITH ID", tempId, "BINDING COUNT", bindingCount);
+  // pusherClient.signin();
+
+  // const channel = pusherClient.subscribe(slug);
+
+  const presenceChannel = pusherClient.subscribe(
+    `presence-${slug}`
+  ) as PresenceChannel;
+
+  (window as any).presenceChannel = presenceChannel;
+
   const newStore = vanillaCreate<PusherZustandStore>((set) => {
     return {
       pusherClient: pusherClient,
-      channel,
+      channel: presenceChannel,
+      presenceChannel,
+
+      members: {},
     };
   });
+
+  const updateMembers = () => {
+    newStore.setState(() => ({
+      members: presenceChannel.members.members,
+    }));
+
+    console.log("members???", presenceChannel.members.members);
+  };
+
+  presenceChannel.bind("pusher:subscription_succeeded", updateMembers);
+  presenceChannel.bind("pusher:member_added", updateMembers);
+  presenceChannel.bind("pusher:member_removed", updateMembers);
 
   return reactZustandCreate(newStore);
 };
@@ -86,3 +126,6 @@ export function useSubscribeToEvent<MessageType>(
     };
   }, [channel, eventName]);
 }
+
+export const useCurrentMemberCount = () =>
+  usePusherStore((s) => Object.keys(s.members).length);

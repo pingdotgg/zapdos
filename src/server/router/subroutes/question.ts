@@ -1,18 +1,9 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
-import PusherServer from "pusher";
-import { env } from "../../env";
 import { t } from "../trpc";
 import { protectedProcedure } from "../utils/protected-procedure";
-
-const pusherServerClient = new PusherServer({
-  appId: env.PUSHER_APP_ID!,
-  key: env.NEXT_PUBLIC_PUSHER_APP_KEY!,
-  secret: env.PUSHER_APP_SECRET!,
-  host: "zback-production.up.railway.app",
-  useTLS: true,
-});
+import { pusherServerClient } from "../../common/pusher";
 
 export const newQuestionRouter = t.router({
   submit: t.procedure
