@@ -60,7 +60,7 @@ export const QuestionsView = () => {
       {data?.map((q) => (
         <div
           key={q.id}
-          className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600"
+          className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600 shadow-xl"
         >
           <div className="flex justify-between border-b border-gray-500 p-4">
             {dayjs(q.createdAt).fromNow()}
