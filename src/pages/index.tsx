@@ -61,7 +61,7 @@ const HomeContents = () => {
             <img
               src={data.user?.image}
               alt="pro pic"
-              className="rounded-full w-24"
+              className="rounded-full w-16"
             />
           )}
           {data.user?.name}
