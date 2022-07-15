@@ -11,8 +11,9 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id String @id @default(cuid())
+enum QuestionStatus {
+    PENDING
+    ANSWERED
 }
 
 model Question {
@@ -21,6 +22,8 @@ model Question {
 
     userId String
     user   User   @relation(fields: [userId], references: [id])
+
+    status QuestionStatus @default(PENDING)
 
     createdAt DateTime @default(now())
 }

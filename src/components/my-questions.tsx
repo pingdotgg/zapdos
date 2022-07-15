@@ -1,6 +1,6 @@
 import { trpc } from "../utils/trpc";
 
-import { FaEye, FaEyeSlash, FaTimes } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaArchive } from "react-icons/fa";
 import { PusherProvider, useSubscribeToEvent } from "../utils/pusher";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -34,14 +34,22 @@ export const QuestionsView = () => {
     setCurrentlyPinnedQuestion(undefined);
   };
 
+  const tctx = trpc.useContext();
+
   const { mutate: removeQuestionMutation } =
-    trpc.proxy.questions.remove.useMutation({
-      onSuccess: () => {
-        refetch();
-      },
-    });
+    trpc.proxy.questions.archive.useMutation();
+
   const removeQuestion = (questionId: string) => {
+    // Optimistic update
+    tctx.queryClient.setQueryData(
+      ["questions.getAll", null],
+      data?.filter((q) => q.id !== questionId)
+    );
+
+    // Mutation to archive question
     removeQuestionMutation({ questionId });
+
+    // Unpin if this one was pinned
     if (questionId === currentlyPinned) unpinQuestion();
   };
 
@@ -68,7 +76,7 @@ export const QuestionsView = () => {
                 </button>
               )}
               <button onClick={() => removeQuestion(q.id)}>
-                <FaTimes size={24} />
+                <FaArchive size={24} />
               </button>
             </div>
           </div>

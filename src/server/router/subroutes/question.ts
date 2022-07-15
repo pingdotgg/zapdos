@@ -43,6 +43,7 @@ export const newQuestionRouter = t.router({
     const questions = await ctx.prisma.question.findMany({
       where: {
         userId: ctx.session.user.id,
+        status: "PENDING",
       },
       orderBy: { id: "desc" },
     });
@@ -73,11 +74,14 @@ export const newQuestionRouter = t.router({
       return question;
     }),
 
-  remove: protectedProcedure
+  archive: protectedProcedure
     .input(z.object({ questionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.question.deleteMany({
+      return await ctx.prisma.question.updateMany({
         where: { id: input.questionId, userId: ctx.session.user.id },
+        data: {
+          status: "ANSWERED",
+        },
       });
     }),
 
