@@ -3,7 +3,7 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaCopy, FaSignOutAlt } from "react-icons/fa";
+import { FaCopy, FaSignOutAlt, FaTwitch } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
 const LazyQuestionsView = dynamic(() => import("../components/my-questions"), {
@@ -47,9 +47,16 @@ const HomeContents = () => {
 
   if (!data)
     return (
-      <div>
-        <div>Please log in</div>
-        <button onClick={() => signIn("twitch")}>Sign in with Twitch</button>
+      <div className="w-screen h-screen flex flex-col items-center justify-center">
+        <div className="text-2xl font-bold">Please log in below</div>
+        <div className="p-4" />
+        <button
+          onClick={() => signIn("twitch")}
+          className="bg-gray-200 rounded text-black px-4 py-2 flex items-center gap-2 text-2xl"
+        >
+          <span>Sign in with Twitch</span>
+          <FaTwitch />
+        </button>
       </div>
     );
 
