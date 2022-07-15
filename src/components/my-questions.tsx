@@ -62,15 +62,6 @@ export const QuestionsView = () => {
                 <FaEye size={24} />
               </button>
             )}
-            {currentlyPinned === q.id && (
-              <button
-                onClick={() =>
-                  currentlyPinned !== q.id ? pinQuestion(q.id) : unpinQuestion()
-                }
-              >
-                <FaEyeSlash size={24} />
-              </button>
-            )}
             <button onClick={() => removeQuestion(q.id)}>
               <FaTimes size={24} />
             </button>
