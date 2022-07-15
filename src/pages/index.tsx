@@ -47,7 +47,7 @@ const HomeContents = () => {
 
   if (!data)
     return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center">
+      <div className="flex grow flex-col items-center justify-center">
         <div className="text-2xl font-bold">Please log in below</div>
         <div className="p-4" />
         <button
@@ -90,7 +90,28 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <HomeContents />
+      <div className="relative flex h-screen w-screen flex-col justify-between">
+        <HomeContents />
+        <div className="flex w-full justify-between bg-black/40 py-4 px-8">
+          <span>
+            Quickly created by{" "}
+            <a href="https://twitter.com/t3dotgg" className="text-blue-300">
+              Theo
+            </a>
+          </span>
+          <div className="flex gap-4">
+            <a
+              href="https://github.com/theobr/zapdos"
+              className="text-blue-300"
+            >
+              Github
+            </a>
+            <a href="https://t3.gg/discord" className="text-blue-300">
+              Discord
+            </a>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
