@@ -1,10 +1,9 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 import Head from "next/head";
-import { trpc } from "../utils/trpc";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaEyeSlash, FaCopy, FaSignOutAlt } from "react-icons/fa";
+import { FaCopy, FaSignOutAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
 const LazyQuestionsView = dynamic(() => import("../components/my-questions"), {
@@ -18,16 +17,9 @@ const copyUrlToClipboard = (path: string) => () => {
 
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: sesh } = useSession();
-  const { mutate: unpinQuestion } = trpc.proxy.questions.unpin.useMutation();
 
   return (
     <div className="flex gap-2">
-      <button
-        onClick={() => unpinQuestion()}
-        className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
-      >
-        Hide Current Q <FaEyeSlash size={24} />
-      </button>
       <button
         onClick={copyUrlToClipboard(`/embed/${userId}`)}
         className="bg-gray-200 text-gray-800 p-4 rounded hover:bg-gray-100 font-bold flex gap-2"
