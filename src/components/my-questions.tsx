@@ -52,14 +52,25 @@ export const QuestionsView = () => {
         >
           {q.body}
           <div className="flex gap-4">
-            <button
-              onClick={() =>
-                currentlyPinned !== q.id ? pinQuestion(q.id) : unpinQuestion()
-              }
-            >
-              {currentlyPinned !== q.id && <FaEye size={24} />}
-              {currentlyPinned === q.id && <FaEyeSlash size={24} />}
-            </button>
+            {currentlyPinned === q.id && (
+              <button onClick={() => unpinQuestion()}>
+                <FaEyeSlash size={24} />
+              </button>
+            )}
+            {currentlyPinned !== q.id && (
+              <button onClick={() => pinQuestion(q.id)}>
+                <FaEye size={24} />
+              </button>
+            )}
+            {currentlyPinned === q.id && (
+              <button
+                onClick={() =>
+                  currentlyPinned !== q.id ? pinQuestion(q.id) : unpinQuestion()
+                }
+              >
+                <FaEyeSlash size={24} />
+              </button>
+            )}
             <button onClick={() => removeQuestion(q.id)}>
               <FaTimes size={24} />
             </button>
