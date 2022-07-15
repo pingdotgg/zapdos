@@ -21,7 +21,7 @@ export const QuestionsView = () => {
   // Refetch when new questions come through
   useSubscribeToEvent("new-question", () => refetch());
 
-  const connectionCount = useCurrentMemberCount();
+  const connectionCount = useCurrentMemberCount() - 1;
 
   const [currentlyPinned, setCurrentlyPinnedQuestion] = useState<
     string | undefined
@@ -72,35 +72,41 @@ export const QuestionsView = () => {
   console.log("\n\n\n WERE RERENDERIN");
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 p-8">
-      <div>Connections: {connectionCount}</div>
-      {data?.map((q) => (
-        <div
-          key={q.id}
-          className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600 shadow-xl"
-        >
-          <div className="flex justify-between border-b border-gray-500 p-4">
-            {dayjs(q.createdAt).fromNow()}
-            <div className="flex gap-4">
-              {currentlyPinned === q.id && (
-                <button onClick={() => unpinQuestion()}>
-                  <FaEyeSlash size={24} />
+    <>
+      <div>
+        {connectionCount > 0 && (
+          <span>Currently connected: {connectionCount}</span>
+        )}
+      </div>
+      <div className="flex flex-wrap justify-center gap-4 p-8">
+        {data?.map((q) => (
+          <div
+            key={q.id}
+            className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600 shadow-xl"
+          >
+            <div className="flex justify-between border-b border-gray-500 p-4">
+              {dayjs(q.createdAt).fromNow()}
+              <div className="flex gap-4">
+                {currentlyPinned === q.id && (
+                  <button onClick={() => unpinQuestion()}>
+                    <FaEyeSlash size={24} />
+                  </button>
+                )}
+                {currentlyPinned !== q.id && (
+                  <button onClick={() => pinQuestion(q.id)}>
+                    <FaEye size={24} />
+                  </button>
+                )}
+                <button onClick={() => removeQuestion(q.id)}>
+                  <FaArchive size={24} />
                 </button>
-              )}
-              {currentlyPinned !== q.id && (
-                <button onClick={() => pinQuestion(q.id)}>
-                  <FaEye size={24} />
-                </button>
-              )}
-              <button onClick={() => removeQuestion(q.id)}>
-                <FaArchive size={24} />
-              </button>
+              </div>
             </div>
+            <div className="p-4">{q.body}</div>
           </div>
-          <div className="p-4">{q.body}</div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </>
   );
 };
 
