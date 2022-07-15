@@ -3,34 +3,61 @@
  *
  * This defines a Pusher client and channel connection as a vanilla Zustand store.
  */
-import Pusher, { Channel } from "pusher-js";
+import Pusher, { Channel, PresenceChannel } from "pusher-js";
 import reactZustandCreate from "zustand";
 import vanillaCreate, { StoreApi } from "zustand/vanilla";
 
 const pusher_key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY!;
-Pusher.logToConsole = true;
 
 interface PusherZustandStore {
   pusherClient: Pusher;
   channel: Channel;
-}
-const createPusherStore = (slug: string) => {
-  const pusherClient = new Pusher(pusher_key, {
-    wsHost: "zback-production.up.railway.app",
-    forceTLS: true,
-    disableStats: true,
-    enabledTransports: ["ws", "wss"],
-  });
+  presenceChannel: PresenceChannel;
 
+  members: { [key: string]: any };
+}
+const createPusherStore = (slug: string, publishPresence?: boolean) => {
+  const tempId = "temp-id" + Math.random().toFixed(7);
+  const pusherClient = new Pusher(pusher_key, {
+    enabledTransports: ["ws", "wss"],
+    authEndpoint: "/api/pusher/auth-channel",
+    auth: {
+      headers: { user_id: tempId },
+    },
+
+    cluster: "us3",
+  });
   const channel = pusherClient.subscribe(slug);
+
+  const presenceChannel = pusherClient.subscribe(
+    `presence-${slug}`
+  ) as PresenceChannel;
+
+  (window as any).presenceChannel = presenceChannel;
+
   const newStore = vanillaCreate<PusherZustandStore>((set) => {
     return {
       pusherClient: pusherClient,
-      channel,
+      channel: channel,
+      presenceChannel,
+
+      members: {},
     };
   });
 
-  return reactZustandCreate(newStore);
+  const updateMembers = () => {
+    newStore.setState(() => ({
+      members: presenceChannel.members.members,
+    }));
+
+    console.log("members???", presenceChannel.members.members);
+  };
+
+  presenceChannel.bind("pusher:subscription_succeeded", updateMembers);
+  presenceChannel.bind("pusher:member_added", updateMembers);
+  presenceChannel.bind("pusher:member_removed", updateMembers);
+
+  return newStore;
 };
 
 /**
@@ -43,6 +70,31 @@ const { Provider: PusherZustandStoreProvider, useStore: usePusherStore } =
   createContext<StoreApi<PusherZustandStore>>();
 
 import React from "react";
+
+// let erroneousRuns = -1;
+// const React18Woes = () => {
+//   const runs = React.useMemo(() => {
+//     erroneousRuns++;
+//     console.log("Number of runs (>0 is bad)", erroneousRuns);
+//     return erroneousRuns;
+//   }, []);
+
+//   return <div>{runs}</div>;
+// };
+
+let erroneousRuns = -1;
+const React18Woes = () => {
+  const [runs] = React.useState(
+    (() => {
+      erroneousRuns++;
+      console.log("Number of runs (>0 is bad)", erroneousRuns);
+      return erroneousRuns;
+    })()
+  );
+
+  return <div>{runs}</div>;
+};
+
 /**
  * This provider is the thing you mount in the app to "give access to Pusher"
  *
@@ -51,8 +103,20 @@ import React from "react";
 export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
+  const [store, setStore] = React.useState<StoreApi<PusherZustandStore>>();
+
+  React.useEffect(() => {
+    const newStore = createPusherStore(slug);
+    setStore(newStore);
+    return () => {
+      newStore.getState().pusherClient.disconnect();
+    };
+  }, [slug]);
+
+  if (!store) return <div />;
+
   return (
-    <PusherZustandStoreProvider createStore={() => createPusherStore(slug)}>
+    <PusherZustandStoreProvider createStore={() => reactZustandCreate(store)}>
       {children}
     </PusherZustandStoreProvider>
   );
@@ -86,3 +150,6 @@ export function useSubscribeToEvent<MessageType>(
     };
   }, [channel, eventName]);
 }
+
+export const useCurrentMemberCount = () =>
+  usePusherStore((s) => Object.keys(s.members).length);
