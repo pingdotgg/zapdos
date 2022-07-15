@@ -61,8 +61,8 @@ const HomeContents = () => {
     );
 
   return (
-    <div className="flex flex-col p-8">
-      <div className="flex w-full items-center justify-between">
+    <div className="flex flex-col">
+      <div className="flex w-full items-center justify-between bg-gray-800 py-4 px-8 shadow">
         <h1 className="flex items-center gap-2 text-2xl font-bold">
           {data.user?.image && (
             <img
@@ -75,7 +75,6 @@ const HomeContents = () => {
         </h1>
         <NavButtons userId={data.user?.id!} />
       </div>
-      <div className="p-4" />
       <LazyQuestionsView />
     </div>
   );
