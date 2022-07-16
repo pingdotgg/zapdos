@@ -16,15 +16,18 @@ interface PusherZustandStore {
 
   members: { [key: string]: any };
 }
+
+// self-contained Pusher state machine that manages:
+// - Pusher Client
+// - Connected/subscribed channels
+// - "Current members" via presence
 const createPusherStore = (slug: string, publishPresence?: boolean) => {
-  const tempId = "temp-id" + Math.random().toFixed(7);
+  const randomUserId = `random-user-id:${Math.random().toFixed(7)}`;
   const pusherClient = new Pusher(pusher_key, {
-    enabledTransports: ["ws", "wss"],
     authEndpoint: "/api/pusher/auth-channel",
     auth: {
-      headers: { user_id: tempId },
+      headers: { user_id: randomUserId },
     },
-
     cluster: "us3",
   });
   const channel = pusherClient.subscribe(slug);
@@ -32,8 +35,6 @@ const createPusherStore = (slug: string, publishPresence?: boolean) => {
   const presenceChannel = pusherClient.subscribe(
     `presence-${slug}`
   ) as PresenceChannel;
-
-  (window as any).presenceChannel = presenceChannel;
 
   const newStore = vanillaCreate<PusherZustandStore>((set) => {
     return {
@@ -45,14 +46,15 @@ const createPusherStore = (slug: string, publishPresence?: boolean) => {
     };
   });
 
+  // Update helper that sets 'members' to contents of presence channel's current members
   const updateMembers = () => {
     newStore.setState(() => ({
       members: presenceChannel.members.members,
     }));
-
-    console.log("members???", presenceChannel.members.members);
+    console.log("Current members updated:", presenceChannel.members.members);
   };
 
+  // Bind all "present users changed" events to trigger updateMembers
   presenceChannel.bind("pusher:subscription_succeeded", updateMembers);
   presenceChannel.bind("pusher:member_added", updateMembers);
   presenceChannel.bind("pusher:member_removed", updateMembers);
@@ -71,49 +73,23 @@ const { Provider: PusherZustandStoreProvider, useStore: usePusherStore } =
 
 import React from "react";
 
-// let erroneousRuns = -1;
-// const React18Woes = () => {
-//   const runs = React.useMemo(() => {
-//     erroneousRuns++;
-//     console.log("Number of runs (>0 is bad)", erroneousRuns);
-//     return erroneousRuns;
-//   }, []);
-
-//   return <div>{runs}</div>;
-// };
-
-let erroneousRuns = -1;
-const React18Woes = () => {
-  const [runs] = React.useState(
-    (() => {
-      erroneousRuns++;
-      console.log("Number of runs (>0 is bad)", erroneousRuns);
-      return erroneousRuns;
-    })()
-  );
-
-  return <div>{runs}</div>;
-};
-
 /**
  * This provider is the thing you mount in the app to "give access to Pusher"
  *
- * Note: MAKE SURE THIS IS NOT SSR'D
  */
 export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
-  const [store, setStore] = React.useState<StoreApi<PusherZustandStore>>();
+  const store = React.useMemo<StoreApi<PusherZustandStore>>(
+    () => createPusherStore(slug),
+    [slug]
+  );
 
   React.useEffect(() => {
-    const newStore = createPusherStore(slug);
-    setStore(newStore);
     return () => {
-      newStore.getState().pusherClient.disconnect();
+      store.getState().pusherClient.disconnect();
     };
-  }, [slug]);
-
-  if (!store) return <div />;
+  }, [store]);
 
   return (
     <PusherZustandStoreProvider createStore={() => reactZustandCreate(store)}>
@@ -126,6 +102,8 @@ export const PusherProvider: React.FC<
  * Section 3: "The Hooks"
  *
  * The exported hooks you use to interact with this store (in this case just an event sub)
+ *
+ * (I really want useEvent tbh)
  */
 export function useSubscribeToEvent<MessageType>(
   eventName: string,
