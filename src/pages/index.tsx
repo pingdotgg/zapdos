@@ -3,8 +3,9 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaCopy, FaSignOutAlt, FaTwitch } from "react-icons/fa";
+import { FaCopy, FaLock, FaLockOpen, FaSignOutAlt, FaTwitch } from "react-icons/fa";
 import dynamic from "next/dynamic";
+import { trpc } from "../utils/trpc";
 
 const LazyQuestionsView = dynamic(() => import("../components/my-questions"), {
   ssr: false,
@@ -15,11 +16,41 @@ const copyUrlToClipboard = (path: string) => () => {
   navigator.clipboard.writeText(`${window.location.origin}${path}`);
 };
 
+const SwitchLoginRequiredButton: React.FC<{ userId: string }> = ({ userId }) => {
+  const { data, refetch } = trpc.proxy.settings.getLoginRequired.useQuery({ userId });
+  const { mutateAsync } = trpc.proxy.settings.setRequiresLogin.useMutation();
+
+  const loginRequired = !!data; // defaults to null
+
+  return (
+    <button
+      onClick={() => {
+        mutateAsync({ loginRequired: !loginRequired }).finally(() => refetch());
+      }}
+      className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
+    >
+      Switch to {" "}
+      {
+        loginRequired && <>
+          open questions <FaLockOpen size={24} />
+        </>
+      }
+      {
+        !loginRequired && <>
+          login required <FaLock size={24} />
+        </>
+      }
+    </button>
+  )
+}
+
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: sesh } = useSession();
 
   return (
     <div className="flex gap-2">
+      <SwitchLoginRequiredButton userId={userId} />
+
       <button
         onClick={copyUrlToClipboard(`/embed/${userId}`)}
         className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
