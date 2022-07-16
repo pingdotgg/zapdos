@@ -10,6 +10,8 @@ const envSchema = z.object({
 
   PUSHER_APP_ID: z.string(),
   NEXT_PUBLIC_PUSHER_APP_KEY: z.string(),
+  NEXT_PUBLIC_PUSHER_SERVER_HOST: z.string(),
+  NEXT_PUBLIC_PUSHER_SERVER_PORT: z.string(),
   PUSHER_APP_SECRET: z.string(),
   PUSHER_APP_CLUSTER: z.string(),
 });
