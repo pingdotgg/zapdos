@@ -82,9 +82,8 @@ import createContext from "zustand/context";
 const { Provider: PusherZustandStoreProvider, useStore: usePusherZustandStore } =
   createContext<StoreApi<PusherZustandStore>>();
 
-import React, { useEffect, memo, useMemo } from 'react';
+import React, { useEffect } from 'react';
 
-const MemoizedPusherZustandStoreProvider = memo(PusherZustandStoreProvider);
 /**
  * This provider is the thing you mount in the app to "give access to Pusher"
  *
@@ -93,11 +92,10 @@ export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
   const store = usePusherStore(slug);
-
   return (
-    <MemoizedPusherZustandStoreProvider createStore={() => store}>
+    <PusherZustandStoreProvider createStore={() => store}>
       {children}
-    </MemoizedPusherZustandStoreProvider>
+    </PusherZustandStoreProvider>
   );
 };
 

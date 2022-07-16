@@ -108,16 +108,14 @@ export const QuestionsView = () => {
   );
 };
 
-const MemoizedPusherProvider = memo(PusherProvider);
-
 export default function QuestionsViewWrapper() {
   const { data: sesh } = useSession();
 
   if (!sesh || !sesh.user?.id) return null;
 
   return (
-    <MemoizedPusherProvider slug={`user-${sesh.user?.id}`}>
+    <PusherProvider slug={`user-${sesh.user?.id}`}>
       <QuestionsView />
-    </MemoizedPusherProvider>
+    </PusherProvider>
   );
 }
