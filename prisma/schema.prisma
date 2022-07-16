@@ -28,6 +28,13 @@ model Question {
     createdAt DateTime @default(now())
 }
 
+model Settings {
+    userId String @id
+    user   User   @relation(fields: [userId], references: [id])
+
+    requiresLogin Boolean @default(false)
+}
+
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -64,7 +71,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
 
-    Question Question[]
+    Question    Question[]
+    QnASettings Settings[]
 }
 
 model VerificationToken {
