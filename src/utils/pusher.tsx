@@ -71,49 +71,23 @@ const { Provider: PusherZustandStoreProvider, useStore: usePusherStore } =
 
 import React from "react";
 
-// let erroneousRuns = -1;
-// const React18Woes = () => {
-//   const runs = React.useMemo(() => {
-//     erroneousRuns++;
-//     console.log("Number of runs (>0 is bad)", erroneousRuns);
-//     return erroneousRuns;
-//   }, []);
-
-//   return <div>{runs}</div>;
-// };
-
-let erroneousRuns = -1;
-const React18Woes = () => {
-  const [runs] = React.useState(
-    (() => {
-      erroneousRuns++;
-      console.log("Number of runs (>0 is bad)", erroneousRuns);
-      return erroneousRuns;
-    })()
-  );
-
-  return <div>{runs}</div>;
-};
-
 /**
  * This provider is the thing you mount in the app to "give access to Pusher"
  *
- * Note: MAKE SURE THIS IS NOT SSR'D
  */
 export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
-  const [store, setStore] = React.useState<StoreApi<PusherZustandStore>>();
+  const store = React.useMemo<StoreApi<PusherZustandStore>>(
+    () => createPusherStore(slug),
+    [slug]
+  );
 
   React.useEffect(() => {
-    const newStore = createPusherStore(slug);
-    setStore(newStore);
     return () => {
-      newStore.getState().pusherClient.disconnect();
+      store.getState().pusherClient.disconnect();
     };
-  }, [slug]);
-
-  if (!store) return <div />;
+  }, [store]);
 
   return (
     <PusherZustandStoreProvider createStore={() => reactZustandCreate(store)}>
