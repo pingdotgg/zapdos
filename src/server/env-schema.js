@@ -11,7 +11,7 @@ const envSchema = z.object({
   PUSHER_APP_ID: z.string(),
   NEXT_PUBLIC_PUSHER_APP_KEY: z.string(),
   PUSHER_APP_SECRET: z.string(),
-  NEXT_PUBLIC_PUSHER_APP_CLUSTER: z.string(),
+  NEXT_PUBLIC_PUSHER_APP_CLUSTER: z.string().default("us3"),
 });
 
 module.exports.envSchema = envSchema;
