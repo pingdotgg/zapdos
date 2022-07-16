@@ -8,6 +8,7 @@ import reactZustandCreate from "zustand";
 import vanillaCreate, { StoreApi } from "zustand/vanilla";
 
 const pusher_key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY!;
+const cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER!;
 
 interface PusherZustandStore {
   pusherClient: Pusher;
@@ -28,7 +29,7 @@ const createPusherStore = (slug: string, publishPresence?: boolean) => {
     auth: {
       headers: { user_id: randomUserId },
     },
-    cluster: "us3",
+    cluster: cluster,
   });
   const channel = pusherClient.subscribe(slug);
 
