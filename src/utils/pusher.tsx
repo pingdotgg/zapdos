@@ -9,6 +9,7 @@ import vanillaCreate, { StoreApi } from "zustand/vanilla";
 const pusher_key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY!;
 const pusher_server_host = process.env.NEXT_PUBLIC_PUSHER_SERVER_HOST!;
 const pusher_server_port = parseInt(process.env.NEXT_PUBLIC_PUSHER_SERVER_PORT!, 10);
+const pusher_server_tls = process.env.NEXT_PUBLIC_PUSHER_SERVER_TLS === 'true';
 
 interface PusherZustandStore {
   pusherClient: Pusher;
@@ -27,8 +28,8 @@ const usePusherStore = (slug: string) => {
     pusherClient = new Pusher(pusher_key, {
       wsHost: pusher_server_host,
       wsPort: pusher_server_port,
-      enabledTransports: ["ws"],
-      forceTLS: false,
+      enabledTransports: pusher_server_tls ? ["ws", "wss"] : ["ws"],
+      forceTLS: pusher_server_tls,
       disableStats: true,
       authEndpoint: "/api/pusher/auth-channel",
       auth: {
@@ -92,6 +93,7 @@ export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
   const store = usePusherStore(slug);
+
   return (
     <PusherZustandStoreProvider createStore={() => store}>
       {children}
