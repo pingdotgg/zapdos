@@ -8,4 +8,5 @@ export const pusherServerClient = new PusherServer({
   host: env.NEXT_PUBLIC_PUSHER_SERVER_HOST!,
   port: env.NEXT_PUBLIC_PUSHER_SERVER_PORT!,
   useTLS: env.NEXT_PUBLIC_PUSHER_SERVER_TLS === 'true',
+  cluster: env.NEXT_PUBLIC_PUSHER_SERVER_CLUSTER!,
 });

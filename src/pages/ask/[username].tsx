@@ -19,32 +19,31 @@ const AskForm = (props: { user: User }) => {
       <Head>
         <title>Ask {props.user?.name} a question!</title>
       </Head>
-      <div className="flex flex-col items-center p-8 text-center">
-        <div className="flex w-full flex-col items-center border-2 bg-gray-900 p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="p-14" />
+        <div className="flex w-full max-w-lg flex-col items-center rounded border border-gray-500 bg-gray-600 p-8">
           {props.user.image && (
             <img
               src={props.user.image}
-              className="h-28 w-28 rounded-full"
+              className="fixed top-14 h-28 w-28 rounded-full border-4 border-gray-500"
               alt="Pro pic"
             />
           )}
+          <div className="p-4" />
           <h1 className="text-2xl font-bold">
             Ask {props.user?.name} a question!
           </h1>
-          <h2>And someone pls make this page less ugly</h2>
-
           <div className="p-4" />
-
           <input
-            placeholder="Question"
-            className="w-full p-1 px-2 text-gray-800"
+            placeholder="Type something..."
+            className="w-full rounded px-2 py-1 text-center text-lg text-gray-800"
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
-          <div className="p-2" />
+          <div className="p-4" />
           <button
-            className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
+            className="flex rounded bg-gray-200 py-2 px-8 font-bold text-gray-800 hover:bg-gray-100"
             onClick={() => {
               if (!question) return;
 
@@ -53,7 +52,7 @@ const AskForm = (props: { user: User }) => {
               setQuestion("");
             }}
           >
-            Submit!
+            Submit
           </button>
         </div>
       </div>

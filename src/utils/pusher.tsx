@@ -10,6 +10,7 @@ const pusher_key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY!;
 const pusher_server_host = process.env.NEXT_PUBLIC_PUSHER_SERVER_HOST!;
 const pusher_server_port = parseInt(process.env.NEXT_PUBLIC_PUSHER_SERVER_PORT!, 10);
 const pusher_server_tls = process.env.NEXT_PUBLIC_PUSHER_SERVER_TLS === 'true';
+const pusher_server_cluster = process.env.NEXT_PUBLIC_PUSHER_SERVER_CLUSTER!
 
 interface PusherZustandStore {
   pusherClient: Pusher;
@@ -30,6 +31,7 @@ const usePusherStore = (slug: string) => {
       wsPort: pusher_server_port,
       enabledTransports: pusher_server_tls ? ["ws", "wss"] : ["ws"],
       forceTLS: pusher_server_tls,
+      cluster: pusher_server_cluster,
       disableStats: true,
       authEndpoint: "/api/pusher/auth-channel",
       auth: {
