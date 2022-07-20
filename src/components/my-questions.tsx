@@ -7,7 +7,7 @@ import {
   useSubscribeToEvent,
 } from "../utils/pusher";
 import { useSession } from "next-auth/react";
-import { useState } from 'react';
+import { useState } from "react";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
