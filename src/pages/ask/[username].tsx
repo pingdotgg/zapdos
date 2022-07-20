@@ -14,8 +14,10 @@ import { FaTwitch } from "react-icons/fa";
 const InputForm: React.FC<{
   userId: string;
   requiresLogin: boolean;
-}> = ({ userId, requiresLogin }) => {
-  const { mutate } = trpc.proxy.questions.submit.useMutation();
+}> = (props) => {
+  const [requiresLogin, setRequiresLogin] = useState(props.requiresLogin);
+
+  const { mutate, isLoading: isSubmitting } = trpc.proxy.questions.submit.useMutation();
   const [question, setQuestion] = useState("");
 
   const { data: session } = useSession();
@@ -48,12 +50,20 @@ const InputForm: React.FC<{
       <div className="p-4 flex gap-2">
         <button
           className="flex items-center rounded bg-gray-200 py-2 px-8 font-bold text-gray-800 hover:bg-gray-100"
+          disabled={isSubmitting}
           onClick={() => {
             if (!question) return;
 
-            mutate({ userId, question });
-
-            setQuestion("");
+            mutate({ userId: props.userId, question }, {
+              onSuccess: () => setQuestion(""),
+              onError: (err) => {
+                if (err.data.code === "UNAUTHORIZED") {
+                  setRequiresLogin(true);
+                } else {
+                  alert("An error occurred, try again or refresh the page");
+                }
+              },
+            });
           }}
         >
           Submit

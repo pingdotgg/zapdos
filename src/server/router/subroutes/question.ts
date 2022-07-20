@@ -14,6 +14,20 @@ export const newQuestionRouter = t.router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const setting = await ctx.prisma.settings.findFirst({
+        where: { userId: input.userId },
+        select: { requiresLogin: true },
+      })
+    
+      // If setting is not found, fallback to login not required
+      const requiresLogin = setting?.requiresLogin ?? false;
+
+      if (requiresLogin) {
+        if (!ctx.session || !ctx.session.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+      }
+
       const question = await ctx.prisma.question.create({
         data: {
           userId: input.userId,
