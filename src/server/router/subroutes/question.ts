@@ -32,6 +32,7 @@ export const newQuestionRouter = t.router({
         data: {
           userId: input.userId,
           body: input.question,
+          authorId: ctx.session?.user?.id,
         },
       });
 
