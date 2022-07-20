@@ -1,7 +1,18 @@
 version: '3.9'
 services:
+  postgres:
+    image: postgres:10.5
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=zapdos
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
   soketi:
-    container_name: 'soketi_server'
     restart: unless-stopped
     image: 'quay.io/soketi/soketi:0.17-16-alpine'
     ports:
@@ -13,8 +24,8 @@ services:
       DEFAULT_APP_KEY: app-key
       DEFAULT_APP_SECRET: app-secret
     networks:
-      - soketi_network
+      - zapdos-network
 
 networks:
-  soketi_network:
+  zapdos-network:
     driver: bridge
