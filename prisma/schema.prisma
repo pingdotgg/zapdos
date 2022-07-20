@@ -2,83 +2,88 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgres"
-    // url      = "file:./db.sqlite"
-    url      = env("DATABASE_URL")
+  provider = "postgres"
+  // url      = "file:./db.sqlite"
+  url      = env("DATABASE_URL")
 }
 
 enum QuestionStatus {
-    PENDING
-    ANSWERED
+  PENDING
+  ANSWERED
 }
 
 model Question {
-    id   String @id @default(cuid())
-    body String @db.Text
+  id   String @id @default(cuid())
+  body String @db.Text
 
-    userId String
-    user   User   @relation(fields: [userId], references: [id])
+  authorId String?
+  author   User?   @relation(name: "author", fields: [authorId], references: [id])
 
-    status QuestionStatus @default(PENDING)
+  userId String
+  user   User   @relation(name: "streamer", fields: [userId], references: [id])
 
-    createdAt DateTime @default(now())
+  status QuestionStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
 }
 
 model Settings {
-    userId String @id
-    user   User   @relation(fields: [userId], references: [id])
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id])
 
-    requiresLogin Boolean @default(false)
+  requiresLogin Boolean @default(false)
 }
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String?
-    access_token      String?
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String?
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 
-    Question    Question[]
-    QnASettings Settings[]
+  Question      Question[] @relation("streamer")
+  QuestionsMade Question[] @relation("author")
+
+  QnASettings Settings[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }
