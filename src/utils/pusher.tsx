@@ -8,9 +8,12 @@ import vanillaCreate, { StoreApi } from "zustand/vanilla";
 
 const pusher_key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY!;
 const pusher_server_host = process.env.NEXT_PUBLIC_PUSHER_SERVER_HOST!;
-const pusher_server_port = parseInt(process.env.NEXT_PUBLIC_PUSHER_SERVER_PORT!, 10);
-const pusher_server_tls = process.env.NEXT_PUBLIC_PUSHER_SERVER_TLS === 'true';
-const pusher_server_cluster = process.env.NEXT_PUBLIC_PUSHER_SERVER_CLUSTER!
+const pusher_server_port = parseInt(
+  process.env.NEXT_PUBLIC_PUSHER_SERVER_PORT!,
+  10
+);
+const pusher_server_tls = process.env.NEXT_PUBLIC_PUSHER_SERVER_TLS === "true";
+const pusher_server_cluster = process.env.NEXT_PUBLIC_PUSHER_SERVER_CLUSTER!;
 
 interface PusherZustandStore {
   pusherClient: Pusher;
@@ -19,8 +22,8 @@ interface PusherZustandStore {
   members: { [key: string]: any };
 }
 
-const usePusherStore = (slug: string) => {
-  let pusherClient : Pusher;
+const createPusherStore = (slug: string) => {
+  let pusherClient: Pusher;
   if (Pusher.instances.length) {
     pusherClient = Pusher.instances[0] as Pusher;
     pusherClient.connect();
@@ -37,7 +40,7 @@ const usePusherStore = (slug: string) => {
       auth: {
         headers: { user_id: randomUserId },
       },
-    })
+    });
   }
 
   const channel = pusherClient.subscribe(slug);
@@ -67,12 +70,6 @@ const usePusherStore = (slug: string) => {
   presenceChannel.bind("pusher:member_added", updateMembers);
   presenceChannel.bind("pusher:member_removed", updateMembers);
 
-  useEffect(() => {
-    return () => {
-      pusherClient.disconnect();
-    };
-  }, []);
-
   return store;
 };
 
@@ -82,10 +79,12 @@ const usePusherStore = (slug: string) => {
  * This creates a "Zustand React Context" that we can provide in the component tree.
  */
 import createContext from "zustand/context";
-const { Provider: PusherZustandStoreProvider, useStore: usePusherZustandStore } =
-  createContext<StoreApi<PusherZustandStore>>();
+const {
+  Provider: PusherZustandStoreProvider,
+  useStore: usePusherZustandStore,
+} = createContext<StoreApi<PusherZustandStore>>();
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 
 /**
  * This provider is the thing you mount in the app to "give access to Pusher"
@@ -94,7 +93,23 @@ import React, { useEffect } from 'react';
 export const PusherProvider: React.FC<
   React.PropsWithChildren<{ slug: string }>
 > = ({ slug, children }) => {
-  const store = usePusherStore(slug);
+  const [store, updateStore] = useState<ReturnType<typeof createPusherStore>>();
+
+  useEffect(() => {
+    const newStore = createPusherStore(slug);
+    updateStore(newStore);
+    return () => {
+      const pusher = newStore.getState().pusherClient;
+      console.log("disconnecting pusher and destroying store", pusher);
+      console.log(
+        "(Expect a warning in terminal after this, React Dev Mode and all)"
+      );
+      pusher.disconnect();
+      newStore.destroy();
+    };
+  }, [slug]);
+
+  if (!store) return null;
 
   return (
     <PusherZustandStoreProvider createStore={() => store}>
