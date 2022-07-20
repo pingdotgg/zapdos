@@ -7,7 +7,7 @@ import {
   useSubscribeToEvent,
 } from "../utils/pusher";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from 'react';
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -69,8 +69,6 @@ export const QuestionsView = () => {
       </div>
     );
 
-  console.log("\n\n\n WERE RERENDERIN");
-
   return (
     <>
       <div>
@@ -110,14 +108,8 @@ export const QuestionsView = () => {
   );
 };
 
-let x = 0;
 export default function QuestionsViewWrapper() {
   const { data: sesh } = useSession();
-
-  useEffect(() => {
-    x++;
-    console.log("New instance?", x);
-  }, []);
 
   if (!sesh || !sesh.user?.id) return null;
 

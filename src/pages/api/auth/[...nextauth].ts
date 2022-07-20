@@ -1,4 +1,4 @@
-import NextAuth, { type NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import TwitchProvider from "next-auth/providers/twitch";
 
 // Prisma adapter for NextAuth, optional and can be removed

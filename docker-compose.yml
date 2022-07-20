@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+  soketi:
+    container_name: 'soketi_server'
+    restart: unless-stopped
+    image: 'quay.io/soketi/soketi:0.17-16-alpine'
+    ports:
+      - '6001:6001'
+      - '9601:9601'
+    environment:
+      DEBUG: 1
+      DEFAULT_APP_ID: default
+      DEFAULT_APP_KEY: app-key
+      DEFAULT_APP_SECRET: app-secret
+    networks:
+      - soketi_network
+
+networks:
+  soketi_network:
+    driver: bridge
