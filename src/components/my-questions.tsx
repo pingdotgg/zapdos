@@ -83,7 +83,11 @@ export const QuestionsView = () => {
             className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600 shadow-xl"
           >
             <div className="flex justify-between border-b border-gray-500 p-4">
-              {dayjs(q.createdAt).fromNow()}
+              <div>
+                <span className={!!!q.authorId || !q.author?.name ? "italic" : ""}>
+                  {!!q.authorId && q.author?.name || "Anonymous"}
+                </span> | {dayjs(q.createdAt).fromNow()}
+              </div>
               <div className="flex gap-4">
                 {currentlyPinned === q.id && (
                   <button onClick={() => unpinQuestion()}>
