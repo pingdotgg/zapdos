@@ -75,6 +75,16 @@ export const newQuestionRouter = t.router({
     .input(z.object({ questionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const question = await ctx.prisma.question.findFirst({
+        select: {
+          userId: true,
+          
+          body: true,
+          author: {
+            select: {
+              name: true,
+            }
+          }
+        },
         where: { id: input.questionId },
       });
       if (!question || question.userId !== ctx.session.user.id) {
@@ -84,11 +94,14 @@ export const newQuestionRouter = t.router({
         });
       }
 
+      const author = question.author?.name || "Anonymous";
+
       await pusherServerClient.trigger(
         `user-${question.userId}`,
         "question-pinned",
         {
           question: question.body,
+          author,
         }
       );
       return question;

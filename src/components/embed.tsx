@@ -1,26 +1,37 @@
 import React, { useState } from 'react';
 import { PusherProvider, useSubscribeToEvent } from "../utils/pusher";
 
-const useLatestPusherMessage = (userId: string) => {
-  const [latestMessage, setLatestMessage] = useState<string | null>(null);
+interface PinnedQuestion {
+  author: string;
+  message: string;
+}
 
-  useSubscribeToEvent("question-pinned", (data: { question: string }) =>
-    setLatestMessage(data.question)
+const useLatestPusherMessage = () => {
+  const [latestMessage, setLatestMessage] = useState<PinnedQuestion | null>(null);
+
+  useSubscribeToEvent("question-pinned", (data: { question: string, author: string }) =>
+    setLatestMessage({
+      author: data.author,
+      message: data.question
+    })
   );
   useSubscribeToEvent("question-unpinned", () => setLatestMessage(null));
 
   return latestMessage;
 };
 
-const BrowserEmbedViewCore: React.FC<{ userId: string }> = ({ userId }) => {
-  const latestMessage = useLatestPusherMessage(userId);
+const BrowserEmbedViewCore: React.FC = () => {
+  const latestMessage = useLatestPusherMessage();
 
   if (!latestMessage) return null;
+
+  const isAnonymous = latestMessage.author === "Anonymous";
 
   return (
     <div className="flex h-screen w-screen items-center justify-center">
       <div className="w-full rounded border-2 bg-gray-900/70 p-8 text-center text-2xl text-white shadow">
-        {latestMessage}
+        <span className={isAnonymous ? "italic" : undefined}>{latestMessage.author}: </span>
+        {latestMessage.message}
       </div>
     </div>
   );
@@ -29,7 +40,7 @@ const BrowserEmbedViewCore: React.FC<{ userId: string }> = ({ userId }) => {
 const BrowserEmbedView: React.FC<{ userId: string }> = (props) => {
   return (
     <PusherProvider slug={`user-${props.userId}`}>
-      <BrowserEmbedViewCore {...props} />
+      <BrowserEmbedViewCore />
     </PusherProvider>
   );
 };
