@@ -7,7 +7,6 @@ import {
   useSubscribeToEvent,
 } from "../utils/pusher";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -23,44 +22,33 @@ export const QuestionsView = () => {
 
   const connectionCount = useCurrentMemberCount() - 1;
 
-  const [currentlyPinned, setCurrentlyPinnedQuestion] = useState<
-    string | undefined
-  >();
-  const { mutate: pinQuestionMutation } =
-    trpc.proxy.questions.pin.useMutation();
-  const pinQuestion = (questionId: string) => {
-    pinQuestionMutation({
-      questionId,
-    });
-    setCurrentlyPinnedQuestion(questionId);
-  };
+  // Question pinning mutation
+  const {
+    mutate: pinQuestion,
+    variables: currentlyPinned, // The "variables" passed are the currently pinned Q
+    reset: resetPinnedQuestionMutation, // The reset allows for "unpinning" on client
+  } = trpc.proxy.questions.pin.useMutation();
+  const pinnedId = currentlyPinned?.questionId;
 
-  const { mutate: unpinQuestionMutation } =
-    trpc.proxy.questions.unpin.useMutation();
-
-  const unpinQuestion = () => {
-    unpinQuestionMutation();
-    setCurrentlyPinnedQuestion(undefined);
-  };
+  const { mutate: unpinQuestion } = trpc.proxy.questions.unpin.useMutation({
+    onMutate: () => {
+      resetPinnedQuestionMutation(); // Reset variables from mutation to "unpin"
+    },
+  });
 
   const tctx = trpc.useContext();
+  const { mutate: removeQuestion } = trpc.proxy.questions.archive.useMutation({
+    onMutate: ({ questionId }) => {
+      // Optimistic update
+      tctx.queryClient.setQueryData(
+        ["questions.getAll", null],
+        data?.filter((q) => q.id !== questionId)
+      );
 
-  const { mutate: removeQuestionMutation } =
-    trpc.proxy.questions.archive.useMutation();
-
-  const removeQuestion = (questionId: string) => {
-    // Optimistic update
-    tctx.queryClient.setQueryData(
-      ["questions.getAll", null],
-      data?.filter((q) => q.id !== questionId)
-    );
-
-    // Mutation to archive question
-    removeQuestionMutation({ questionId });
-
-    // Unpin if this one was pinned
-    if (questionId === currentlyPinned) unpinQuestion();
-  };
+      // Unpin if this one was pinned
+      if (questionId === pinnedId) unpinQuestion();
+    },
+  });
 
   if (isLoading)
     return (
@@ -85,17 +73,17 @@ export const QuestionsView = () => {
             <div className="flex justify-between border-b border-gray-500 p-4">
               {dayjs(q.createdAt).fromNow()}
               <div className="flex gap-4">
-                {currentlyPinned === q.id && (
+                {pinnedId === q.id && (
                   <button onClick={() => unpinQuestion()}>
                     <FaEyeSlash size={24} />
                   </button>
                 )}
-                {currentlyPinned !== q.id && (
-                  <button onClick={() => pinQuestion(q.id)}>
+                {pinnedId !== q.id && (
+                  <button onClick={() => pinQuestion({ questionId: q.id })}>
                     <FaEye size={24} />
                   </button>
                 )}
-                <button onClick={() => removeQuestion(q.id)}>
+                <button onClick={() => removeQuestion({ questionId: q.id })}>
                   <FaArchive size={24} />
                 </button>
               </div>
