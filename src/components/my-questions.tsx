@@ -14,7 +14,7 @@ dayjs.extend(relativeTime);
 
 import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const AnimatedQuestionsWrapper = (
