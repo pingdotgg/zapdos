@@ -17,7 +17,7 @@ const AskForm = (props: { user: User }) => {
   return (
     <>
       <Head>
-        <title>Ask {props.user?.name} a question!</title>
+        <title>{`Ask ${props.user?.name} a question!`}</title>
       </Head>
       <div className="flex flex-col items-center text-center">
         <div className="p-14" />
