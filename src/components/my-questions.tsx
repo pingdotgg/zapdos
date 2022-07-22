@@ -14,10 +14,22 @@ dayjs.extend(relativeTime);
 
 import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
-import React from "react";
-import autoAnimate from "@formkit/auto-animate";
+import { PropsWithChildren } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
-export const QuestionsView = () => {
+const AnimatedQuestionsWrapper = (
+  props: PropsWithChildren<{ className: string }>
+) => {
+  const [parent] = useAutoAnimate<HTMLDivElement>();
+
+  return (
+    <div ref={parent} className={props.className}>
+      {props.children}
+    </div>
+  );
+};
+
+const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
   // Refetch when new questions come through
   useSubscribeToEvent("new-question", () => refetch());
@@ -52,12 +64,6 @@ export const QuestionsView = () => {
     },
   });
 
-  const parent = React.useRef(null);
-
-  React.useEffect(() => {
-    parent.current && autoAnimate(parent.current);
-  }, [parent, isLoading]);
-
   if (isLoading)
     return (
       <div className="flex animate-fade-in-delay justify-center p-8">
@@ -72,7 +78,7 @@ export const QuestionsView = () => {
           <span>Currently connected: {connectionCount}</span>
         )}
       </div>
-      <div className="flex flex-wrap justify-center gap-4 p-8" ref={parent}>
+      <AnimatedQuestionsWrapper className="flex flex-wrap justify-center gap-4 p-8">
         {data?.map((q) => (
           <div
             key={q.id}
@@ -99,7 +105,7 @@ export const QuestionsView = () => {
             <div className="p-4">{q.body}</div>
           </div>
         ))}
-      </div>
+      </AnimatedQuestionsWrapper>
     </>
   );
 };
