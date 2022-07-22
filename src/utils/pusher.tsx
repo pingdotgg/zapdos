@@ -19,7 +19,7 @@ interface PusherZustandStore {
   pusherClient: Pusher;
   channel: Channel;
   presenceChannel: PresenceChannel;
-  members: { [key: string]: any };
+  members: Map<string, any>;
 }
 
 const createPusherStore = (slug: string) => {
@@ -54,14 +54,14 @@ const createPusherStore = (slug: string) => {
       pusherClient: pusherClient,
       channel: channel,
       presenceChannel,
-      members: {},
+      members: new Map(),
     };
   });
 
   // Update helper that sets 'members' to contents of presence channel's current members
   const updateMembers = () => {
     store.setState(() => ({
-      members: presenceChannel.members.members,
+      members: new Map(Object.entries(presenceChannel.members.members)),
     }));
   };
 
@@ -150,4 +150,4 @@ export function useSubscribeToEvent<MessageType>(
 }
 
 export const useCurrentMemberCount = () =>
-  usePusherZustandStore((s) => Object.keys(s.members).length);
+  usePusherZustandStore((s) => s.members.size);
