@@ -14,6 +14,8 @@ dayjs.extend(relativeTime);
 
 import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
+import React from "react";
+import autoAnimate from "@formkit/auto-animate";
 
 export const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
@@ -50,6 +52,12 @@ export const QuestionsView = () => {
     },
   });
 
+  const parent = React.useRef(null);
+
+  React.useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent, isLoading]);
+
   if (isLoading)
     return (
       <div className="flex animate-fade-in-delay justify-center p-8">
@@ -64,7 +72,7 @@ export const QuestionsView = () => {
           <span>Currently connected: {connectionCount}</span>
         )}
       </div>
-      <div className="flex flex-wrap justify-center gap-4 p-8">
+      <div className="flex flex-wrap justify-center gap-4 p-8" ref={parent}>
         {data?.map((q) => (
           <div
             key={q.id}
