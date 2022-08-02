@@ -23,7 +23,8 @@ const AskForm = (props: { user: User }) => {
 				<div className="p-14" />
 				<form
 					className="flex w-full max-w-lg flex-col items-center rounded border border-gray-500 bg-gray-600 p-8"
-					onSubmit={() => {
+					onSubmit={(e) => {
+						e.preventDefault();
 						if (!question) return;
 
 						mutate({ userId: props.user.id, question });
