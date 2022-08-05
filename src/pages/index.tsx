@@ -112,7 +112,11 @@ const QuestionsView = () => {
             className="flex animate-fade-in-down flex-col divide-y divide-gray-800"
           >
             <div className="flex justify-between p-4">
-              {dayjs(q.createdAt).fromNow()}
+              <div>
+                <span className={!!!q.authorId || !q.author?.name ? "italic" : ""}>
+                  {!!q.authorId && q.author?.name || "Anonymous"}
+                </span> | {dayjs(q.createdAt).fromNow()}
+              </div>
               <div className="flex gap-4">
                 {pinnedId === q.id && (
                   <button onClick={() => unpinQuestion()}>

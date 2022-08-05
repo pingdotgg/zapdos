@@ -47,6 +47,20 @@ export const newQuestionRouter = t.router({
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const questions = await ctx.prisma.question.findMany({
+      select: {
+        id: true,
+        body: true,
+        createdAt: true,
+        status: true,
+        userId: true,
+        authorId: true,
+
+        author: {
+          select: {
+            name: true,
+          }
+        }
+      },
       where: {
         userId: ctx.session.user.id,
         status: "PENDING",
