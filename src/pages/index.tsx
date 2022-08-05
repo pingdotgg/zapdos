@@ -4,19 +4,20 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
 import {
-  FaArrowCircleRight,
   FaCaretSquareRight,
   FaCopy,
   FaSignOutAlt,
   FaTwitch,
-  FaLock, 
+  FaLock,
   FaLockOpen,
+  FaEye, 
+  FaEyeSlash, 
+  FaArchive,
 } from "react-icons/fa";
 
 import dynamic from "next/dynamic";
 import { trpc } from "../utils/trpc";
 
-import { FaEye, FaEyeSlash, FaArchive } from "react-icons/fa";
 import {
   PusherProvider,
   useCurrentMemberCount,
@@ -81,7 +82,15 @@ const QuestionsView = () => {
       <div className="col-span-2 flex py-4 pl-6 pr-3">
         <Card className="flex flex-1 flex-col divide-y divide-gray-800">
           <AutoAnimate className="flex flex-1 items-center justify-center p-4 text-lg font-medium">
-            <span key={selectedQuestion?.id}>{selectedQuestion?.body}</span>
+            {
+              selectedQuestion && (
+                <span key={selectedQuestion?.id}>
+                  <span className={!!!selectedQuestion.authorId || !selectedQuestion.author?.name ? "italic" : ""}>
+                    {!!selectedQuestion.authorId && selectedQuestion.author?.name || "Anonymous"}:
+                  </span> {selectedQuestion.body}
+                </span>
+              )
+            }
           </AutoAnimate>
           <div className="grid grid-cols-2 divide-x divide-gray-800">
             <button
