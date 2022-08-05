@@ -9,9 +9,11 @@ import {
   FaCopy,
   FaSignOutAlt,
   FaTwitch,
+  FaLock, 
+  FaLockOpen,
 } from "react-icons/fa";
-import dynamic from "next/dynamic";
 
+import dynamic from "next/dynamic";
 import { trpc } from "../utils/trpc";
 
 import { FaEye, FaEyeSlash, FaArchive } from "react-icons/fa";
@@ -156,11 +158,41 @@ const copyUrlToClipboard = (path: string) => () => {
   navigator.clipboard.writeText(`${window.location.origin}${path}`);
 };
 
+const SwitchLoginRequiredButton: React.FC<{ userId: string }> = ({ userId }) => {
+  const { data, refetch } = trpc.proxy.settings.getLoginRequired.useQuery({ userId });
+  const { mutateAsync } = trpc.proxy.settings.setRequiresLogin.useMutation();
+
+  const loginRequired = !!data; // defaults to null
+
+  return (
+    <button
+      onClick={() => {
+        mutateAsync({ loginRequired: !loginRequired }).finally(() => refetch());
+      }}
+      className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
+    >
+      Switch to {" "}
+      {
+        loginRequired && <>
+          open questions <FaLockOpen size={24} />
+        </>
+      }
+      {
+        !loginRequired && <>
+          login required <FaLock size={24} />
+        </>
+      }
+    </button>
+  )
+}
+
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: sesh } = useSession();
 
   return (
     <div className="flex gap-2">
+      <SwitchLoginRequiredButton userId={userId} />
+
       <button
         onClick={copyUrlToClipboard(`/embed/${userId}`)}
         className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
