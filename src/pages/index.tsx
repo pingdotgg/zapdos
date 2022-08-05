@@ -3,7 +3,13 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaCopy, FaSignOutAlt, FaTwitch } from "react-icons/fa";
+import {
+  FaArrowCircleRight,
+  FaCaretSquareRight,
+  FaCopy,
+  FaSignOutAlt,
+  FaTwitch,
+} from "react-icons/fa";
 import dynamic from "next/dynamic";
 
 import { trpc } from "../utils/trpc";
@@ -23,18 +29,8 @@ import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
 import { PropsWithChildren, useEffect } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-
-const AnimatedQuestionsWrapper = (
-  props: PropsWithChildren<{ className: string }>
-) => {
-  const [parent] = useAutoAnimate<HTMLDivElement>();
-
-  return (
-    <div ref={parent} className={props.className}>
-      {props.children}
-    </div>
-  );
-};
+import { Card } from "../components/card";
+import { AutoAnimate } from "../components/auto-animate";
 
 const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
@@ -65,9 +61,6 @@ const QuestionsView = () => {
         ["questions.getAll", null],
         data?.filter((q) => q.id !== questionId)
       );
-
-      // Unpin if this one was pinned
-      if (questionId === pinnedId) unpinQuestion();
     },
   });
 
@@ -78,41 +71,75 @@ const QuestionsView = () => {
       </div>
     );
 
+  const selectedQuestion = data?.find((q) => q.id === pinnedId);
+  const otherQuestions = data?.filter((q) => q.id !== pinnedId) || [];
+
   return (
     <>
-      <div>
+      <div className="grid grid-cols-3 gap-6 px-6 py-4">
+        <div className="col-span-2">
+          <Card className="flex flex-col divide-y divide-gray-800">
+            {selectedQuestion && (
+              <>
+                <div className="h-48 p-4">{selectedQuestion?.body}</div>
+                <div className="grid grid-cols-2 divide-x divide-gray-800">
+                  <button
+                    className="flex items-center justify-center gap-2 rounded-bl p-4 hover:bg-gray-700"
+                    onClick={() => unpinQuestion()}
+                  >
+                    <FaEyeSlash /> Hide
+                  </button>
+                  <button
+                    className="flex items-center justify-center gap-2 rounded-br p-4 hover:bg-gray-700"
+                    onClick={() => {
+                      removeQuestion({ questionId: selectedQuestion.id });
+                      const next = otherQuestions[0]?.id;
+                      if (next) pinQuestion({ questionId: next });
+                    }}
+                  >
+                    <FaCaretSquareRight />
+                    Next Question
+                  </button>
+                </div>
+              </>
+            )}
+          </Card>
+        </div>
+        <AutoAnimate className="col-span-1 flex flex-col gap-4">
+          {otherQuestions.map((q) => (
+            <Card
+              key={q.id}
+              className="flex animate-fade-in-down flex-col divide-y divide-gray-800"
+            >
+              <div className="flex justify-between p-4">
+                {dayjs(q.createdAt).fromNow()}
+                <div className="flex gap-4">
+                  {pinnedId === q.id && (
+                    <button onClick={() => unpinQuestion()}>
+                      <FaEyeSlash size={24} />
+                    </button>
+                  )}
+                  {pinnedId !== q.id && (
+                    <button onClick={() => pinQuestion({ questionId: q.id })}>
+                      <FaEye size={24} />
+                    </button>
+                  )}
+                  <button onClick={() => removeQuestion({ questionId: q.id })}>
+                    <FaArchive size={24} />
+                  </button>
+                </div>
+              </div>
+              <div className="p-4">{q.body}</div>
+            </Card>
+          ))}
+        </AutoAnimate>
+      </div>
+      {/* <div>
         {connectionCount > 0 && (
           <span>Currently connected: {connectionCount}</span>
         )}
       </div>
-      <AnimatedQuestionsWrapper className="flex flex-wrap justify-center gap-4 p-8">
-        {data?.map((q) => (
-          <div
-            key={q.id}
-            className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600 shadow-xl"
-          >
-            <div className="flex justify-between border-b border-gray-500 p-4">
-              {dayjs(q.createdAt).fromNow()}
-              <div className="flex gap-4">
-                {pinnedId === q.id && (
-                  <button onClick={() => unpinQuestion()}>
-                    <FaEyeSlash size={24} />
-                  </button>
-                )}
-                {pinnedId !== q.id && (
-                  <button onClick={() => pinQuestion({ questionId: q.id })}>
-                    <FaEye size={24} />
-                  </button>
-                )}
-                <button onClick={() => removeQuestion({ questionId: q.id })}>
-                  <FaArchive size={24} />
-                </button>
-              </div>
-            </div>
-            <div className="p-4">{q.body}</div>
-          </div>
-        ))}
-      </AnimatedQuestionsWrapper>
+       */}
     </>
   );
 };

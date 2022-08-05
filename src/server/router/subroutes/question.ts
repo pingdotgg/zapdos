@@ -36,7 +36,7 @@ export const newQuestionRouter = t.router({
         userId: ctx.session.user.id,
         status: "PENDING",
       },
-      orderBy: { id: "desc" },
+      orderBy: { id: "asc" },
     });
 
     return questions;
