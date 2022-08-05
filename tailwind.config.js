@@ -4,6 +4,11 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        gray: {
+          750: "#2B3544",
+        },
+      },
       keyframes: {
         "fade-in": {
           "0%": {

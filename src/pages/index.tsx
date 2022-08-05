@@ -3,7 +3,13 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaCopy, FaSignOutAlt, FaTwitch } from "react-icons/fa";
+import {
+  FaArrowCircleRight,
+  FaCaretSquareRight,
+  FaCopy,
+  FaSignOutAlt,
+  FaTwitch,
+} from "react-icons/fa";
 import dynamic from "next/dynamic";
 
 import { trpc } from "../utils/trpc";
@@ -23,18 +29,8 @@ import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
 import { PropsWithChildren, useEffect } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-
-const AnimatedQuestionsWrapper = (
-  props: PropsWithChildren<{ className: string }>
-) => {
-  const [parent] = useAutoAnimate<HTMLDivElement>();
-
-  return (
-    <div ref={parent} className={props.className}>
-      {props.children}
-    </div>
-  );
-};
+import { Card } from "../components/card";
+import { AutoAnimate } from "../components/auto-animate";
 
 const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
@@ -65,9 +61,6 @@ const QuestionsView = () => {
         ["questions.getAll", null],
         data?.filter((q) => q.id !== questionId)
       );
-
-      // Unpin if this one was pinned
-      if (questionId === pinnedId) unpinQuestion();
     },
   });
 
@@ -78,20 +71,45 @@ const QuestionsView = () => {
       </div>
     );
 
+  const selectedQuestion = data?.find((q) => q.id === pinnedId);
+  const otherQuestions = data?.filter((q) => q.id !== pinnedId) || [];
+
   return (
-    <>
-      <div>
-        {connectionCount > 0 && (
-          <span>Currently connected: {connectionCount}</span>
-        )}
+    <div className="grid min-h-0 flex-1 grid-cols-3">
+      <div className="col-span-2 flex py-4 pl-6 pr-3">
+        <Card className="flex flex-1 flex-col divide-y divide-gray-800">
+          <AutoAnimate className="flex flex-1 items-center justify-center p-4 text-lg font-medium">
+            <span key={selectedQuestion?.id}>{selectedQuestion?.body}</span>
+          </AutoAnimate>
+          <div className="grid grid-cols-2 divide-x divide-gray-800">
+            <button
+              className="flex items-center justify-center gap-2 rounded-bl p-4 hover:bg-gray-700"
+              onClick={() => unpinQuestion()}
+            >
+              <FaEyeSlash /> Hide
+            </button>
+            <button
+              className="flex items-center justify-center gap-2 rounded-br p-4 hover:bg-gray-700"
+              onClick={() => {
+                if (selectedQuestion)
+                  removeQuestion({ questionId: selectedQuestion.id });
+                const next = otherQuestions[0]?.id;
+                if (next) pinQuestion({ questionId: next });
+              }}
+            >
+              <FaCaretSquareRight />
+              Next Question
+            </button>
+          </div>
+        </Card>
       </div>
-      <AnimatedQuestionsWrapper className="flex flex-wrap justify-center gap-4 p-8">
-        {data?.map((q) => (
-          <div
+      <AutoAnimate className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
+        {otherQuestions.map((q) => (
+          <Card
             key={q.id}
-            className="flex h-52 w-96 animate-fade-in-down flex-col rounded border border-gray-500 bg-gray-600 shadow-xl"
+            className="flex animate-fade-in-down flex-col divide-y divide-gray-800"
           >
-            <div className="flex justify-between border-b border-gray-500 p-4">
+            <div className="flex justify-between p-4">
               {dayjs(q.createdAt).fromNow()}
               <div className="flex gap-4">
                 {pinnedId === q.id && (
@@ -110,10 +128,10 @@ const QuestionsView = () => {
               </div>
             </div>
             <div className="p-4">{q.body}</div>
-          </div>
+          </Card>
         ))}
-      </AnimatedQuestionsWrapper>
-    </>
+      </AutoAnimate>
+    </div>
   );
 };
 
@@ -184,8 +202,8 @@ const HomeContents = () => {
     );
 
   return (
-    <div className="flex flex-col">
-      <div className="flex w-full items-center justify-between bg-gray-800 py-4 px-8 shadow">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex items-center justify-between bg-gray-800 py-4 px-8 shadow">
         <h1 className="flex items-center gap-2 text-2xl font-bold">
           {data.user?.image && (
             <img
@@ -214,7 +232,7 @@ const Home: NextPage = () => {
 
       <div className="relative flex h-screen w-screen flex-col justify-between">
         <HomeContents />
-        <div className="flex w-full justify-between bg-black/40 py-4 px-8">
+        <div className="flex justify-between bg-black/40 py-4 px-8">
           <span>
             Quickly created by{" "}
             <a href="https://twitter.com/t3dotgg" className="text-blue-300">
