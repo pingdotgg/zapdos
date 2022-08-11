@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "migrate": "prisma migrate dev --name init"
+    "migrate": "prisma migrate dev --name init",
+    "format": "prettier --write --plugin-search-dir=. ."
   },
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.1",
