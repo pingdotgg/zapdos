@@ -104,35 +104,47 @@ const QuestionsView = () => {
           </div>
         </Card>
       </div>
-      <AutoAnimate className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
-        {otherQuestions.map((q) => (
-          <Card
-            key={q.id}
-            className="relative flex animate-fade-in-down flex-col gap-4 p-4"
-          >
-            <div>{q.body}</div>
-            <div className="flex items-center justify-between text-gray-300">
-              <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
-              <button
-                className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
-                onClick={() => removeQuestion({ questionId: q.id })}
-              >
-                <FaTrash />
-                <span>Remove</span>
-              </button>
-            </div>
-            <button
-              className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-              onClick={() => pinQuestion({ questionId: q.id })}
-            >
-              <span className="flex items-center gap-1.5">
-                <FaEye />
-                Show question
+      <div className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
+        <div>
+          <h2 className="flex items-center gap-1.5 font-medium">
+            <span>Questions</span>
+            {data && (
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
+                {data.length}
               </span>
-            </button>
-          </Card>
-        ))}
-      </AutoAnimate>
+            )}
+          </h2>
+        </div>
+        <AutoAnimate className="flex flex-col gap-4">
+          {otherQuestions.map((q) => (
+            <Card
+              key={q.id}
+              className="relative flex animate-fade-in-down flex-col gap-4 p-4"
+            >
+              <div className="break-words">{q.body}</div>
+              <div className="flex items-center justify-between text-gray-300">
+                <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
+                <button
+                  className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+                  onClick={() => removeQuestion({ questionId: q.id })}
+                >
+                  <FaTrash />
+                  <span>Remove</span>
+                </button>
+              </div>
+              <button
+                className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+                onClick={() => pinQuestion({ questionId: q.id })}
+              >
+                <span className="flex items-center gap-1.5">
+                  <FaEye />
+                  Show question
+                </span>
+              </button>
+            </Card>
+          ))}
+        </AutoAnimate>
+      </div>
     </div>
   );
 };

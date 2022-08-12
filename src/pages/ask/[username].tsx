@@ -43,6 +43,7 @@ const AskForm = (props: { user: User }) => {
                 className="w-full rounded px-2 py-1 text-center text-lg text-gray-800"
                 type="text"
                 value={question}
+                maxLength={400}
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSubmit();
