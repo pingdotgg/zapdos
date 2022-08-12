@@ -8,6 +8,7 @@ import {
   FaCaretSquareRight,
   FaCopy,
   FaSignOutAlt,
+  FaTrash,
   FaTwitch,
 } from "react-icons/fa";
 import dynamic from "next/dynamic";
@@ -107,27 +108,28 @@ const QuestionsView = () => {
         {otherQuestions.map((q) => (
           <Card
             key={q.id}
-            className="flex animate-fade-in-down flex-col divide-y divide-gray-800"
+            className="relative flex animate-fade-in-down flex-col gap-4 p-4"
           >
-            <div className="flex justify-between p-4">
-              {dayjs(q.createdAt).fromNow()}
-              <div className="flex gap-4">
-                {pinnedId === q.id && (
-                  <button onClick={() => unpinQuestion()}>
-                    <FaEyeSlash size={24} />
-                  </button>
-                )}
-                {pinnedId !== q.id && (
-                  <button onClick={() => pinQuestion({ questionId: q.id })}>
-                    <FaEye size={24} />
-                  </button>
-                )}
-                <button onClick={() => removeQuestion({ questionId: q.id })}>
-                  <FaArchive size={24} />
-                </button>
-              </div>
+            <div>{q.body}</div>
+            <div className="flex items-center justify-between text-gray-300">
+              <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
+              <button
+                className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+                onClick={() => removeQuestion({ questionId: q.id })}
+              >
+                <FaTrash />
+                <span>Remove</span>
+              </button>
             </div>
-            <div className="p-4">{q.body}</div>
+            <button
+              className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+              onClick={() => pinQuestion({ questionId: q.id })}
+            >
+              <span className="flex items-center gap-1.5">
+                <FaEye />
+                Show question
+              </span>
+            </button>
           </Card>
         ))}
       </AutoAnimate>
