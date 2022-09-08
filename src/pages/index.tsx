@@ -8,6 +8,10 @@ import {
   FaCaretSquareRight,
   FaCopy,
   FaSignOutAlt,
+  FaSortAlphaDown,
+  FaSortAmountDown,
+  FaSortAmountUp,
+  FaSortNumericDown,
   FaTrash,
   FaTwitch,
 } from "react-icons/fa";
@@ -28,10 +32,11 @@ dayjs.extend(relativeTime);
 
 import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Card } from "../components/card";
 import { AutoAnimate } from "../components/auto-animate";
+import clsx from "clsx";
 
 const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
@@ -39,6 +44,7 @@ const QuestionsView = () => {
   useSubscribeToEvent("new-question", () => refetch());
 
   const connectionCount = useCurrentMemberCount() - 1;
+  const [reverseSort, setReverseSort] = useState(false);
 
   // Question pinning mutation
   const {
@@ -105,17 +111,26 @@ const QuestionsView = () => {
         </Card>
       </div>
       <div className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
-        <div>
+        <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-1.5 font-medium">
             <span>Questions</span>
-            {data && (
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
-                {data.length}
-              </span>
-            )}
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
+              {otherQuestions.length}
+            </span>
           </h2>
+          <button
+            className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+            onClick={() => setReverseSort(!reverseSort)}
+          >
+            {reverseSort ? <FaSortAmountUp /> : <FaSortAmountDown />}
+          </button>
         </div>
-        <AutoAnimate className="flex flex-col gap-4">
+        <AutoAnimate
+          className={clsx(
+            "flex gap-4",
+            reverseSort ? "flex-col-reverse" : "flex-col"
+          )}
+        >
           {otherQuestions.map((q) => (
             <Card
               key={q.id}
