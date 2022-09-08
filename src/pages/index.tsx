@@ -8,6 +8,11 @@ import {
   FaCaretSquareRight,
   FaCopy,
   FaSignOutAlt,
+  FaSortAlphaDown,
+  FaSortAmountDown,
+  FaSortAmountUp,
+  FaSortNumericDown,
+  FaTrash,
   FaTwitch,
 } from "react-icons/fa";
 import dynamic from "next/dynamic";
@@ -27,10 +32,11 @@ dayjs.extend(relativeTime);
 
 import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Card } from "../components/card";
 import { AutoAnimate } from "../components/auto-animate";
+import clsx from "clsx";
 
 const QuestionsView = () => {
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
@@ -38,6 +44,7 @@ const QuestionsView = () => {
   useSubscribeToEvent("new-question", () => refetch());
 
   const connectionCount = useCurrentMemberCount() - 1;
+  const [reverseSort, setReverseSort] = useState(false);
 
   // Question pinning mutation
   const {
@@ -103,34 +110,56 @@ const QuestionsView = () => {
           </div>
         </Card>
       </div>
-      <AutoAnimate className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
-        {otherQuestions.map((q) => (
-          <Card
-            key={q.id}
-            className="flex animate-fade-in-down flex-col divide-y divide-gray-800"
+      <div className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
+        <div className="flex items-center justify-between">
+          <h2 className="flex items-center gap-1.5 font-medium">
+            <span>Questions</span>
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
+              {otherQuestions.length}
+            </span>
+          </h2>
+          <button
+            className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+            onClick={() => setReverseSort(!reverseSort)}
           >
-            <div className="flex justify-between p-4">
-              {dayjs(q.createdAt).fromNow()}
-              <div className="flex gap-4">
-                {pinnedId === q.id && (
-                  <button onClick={() => unpinQuestion()}>
-                    <FaEyeSlash size={24} />
-                  </button>
-                )}
-                {pinnedId !== q.id && (
-                  <button onClick={() => pinQuestion({ questionId: q.id })}>
-                    <FaEye size={24} />
-                  </button>
-                )}
-                <button onClick={() => removeQuestion({ questionId: q.id })}>
-                  <FaArchive size={24} />
+            {reverseSort ? <FaSortAmountUp /> : <FaSortAmountDown />}
+          </button>
+        </div>
+        <AutoAnimate
+          className={clsx(
+            "flex gap-4",
+            reverseSort ? "flex-col-reverse" : "flex-col"
+          )}
+        >
+          {otherQuestions.map((q) => (
+            <Card
+              key={q.id}
+              className="relative flex animate-fade-in-down flex-col gap-4 p-4"
+            >
+              <div className="break-words">{q.body}</div>
+              <div className="flex items-center justify-between text-gray-300">
+                <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
+                <button
+                  className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+                  onClick={() => removeQuestion({ questionId: q.id })}
+                >
+                  <FaTrash />
+                  <span>Remove</span>
                 </button>
               </div>
-            </div>
-            <div className="p-4">{q.body}</div>
-          </Card>
-        ))}
-      </AutoAnimate>
+              <button
+                className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+                onClick={() => pinQuestion({ questionId: q.id })}
+              >
+                <span className="flex items-center gap-1.5">
+                  <FaEye />
+                  Show question
+                </span>
+              </button>
+            </Card>
+          ))}
+        </AutoAnimate>
+      </div>
     </div>
   );
 };
