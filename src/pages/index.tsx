@@ -34,6 +34,7 @@ import LoadingSVG from "../assets/puff.svg";
 import Image from "next/image";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { AutoAnimate } from "../components/auto-animate";
 import clsx from "clsx";
@@ -218,24 +219,25 @@ const HomeContents = () => {
   if (!data)
     return (
       <div className="flex grow flex-col items-center justify-center p-4">
-        <div className="relative mb-8 text-8xl font-bold">
+        <div className="relative mb-8 text-6xl font-bold">
           Ping Ask{" "}
-          <sup className="absolute top-0 left-full text-base text-pink-400">
+          <sup className="absolute top-0 left-full text-xs text-pink-400">
             [BETA]
           </sup>
         </div>
-        <div className="prose max-w-prose text-2xl">
+        <div className="mb-8 text-center text-lg">
           An easy way to curate questions from your audience and embed them in
           your OBS.
         </div>
-        <div className="p-4" />
-        <button
+        <Button
+          variant="secondary-inverted"
+          size="xl"
           onClick={() => signIn("twitch")}
-          className="flex items-center gap-2 rounded bg-gray-200 px-4 py-2 text-2xl text-black"
         >
-          <span>Sign in with Twitch</span>
-          <FaTwitch />
-        </button>
+          <div className="flex items-center">
+            <FaTwitch /> &nbsp; Sign In
+          </div>
+        </Button>
       </div>
     );
 
