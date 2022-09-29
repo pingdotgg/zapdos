@@ -2,7 +2,7 @@ import type { GetServerSidePropsContext, NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { getZapdosAuthSession } from "../server/common/get-server-session";
-
+import Background from "../assets/background.svg";
 import {
   FaArrowCircleRight,
   FaCaretSquareRight,
@@ -217,8 +217,17 @@ const HomeContents = () => {
 
   if (!data)
     return (
-      <div className="flex grow flex-col items-center justify-center">
-        <div className="text-2xl font-bold">Please log in below</div>
+      <div className="flex grow flex-col items-center justify-center p-4">
+        <div className="relative mb-8 text-8xl font-bold">
+          Ping Ask{" "}
+          <sup className="absolute top-0 left-full text-base text-pink-400">
+            [BETA]
+          </sup>
+        </div>
+        <div className="prose max-w-prose text-2xl">
+          An easy way to curate questions from your audience and embed them in
+          your OBS.
+        </div>
         <div className="p-4" />
         <button
           onClick={() => signIn("twitch")}
@@ -232,7 +241,7 @@ const HomeContents = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between bg-gray-800 py-4 px-8 shadow">
+      <div className="flex items-center justify-between bg-gray-900 py-4 px-8 shadow">
         <h1 className="flex items-center gap-2 text-2xl font-bold">
           {data.user?.image && (
             <img
@@ -259,23 +268,38 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="relative flex h-screen w-screen flex-col justify-between">
+      <div
+        className="relative flex h-screen w-screen flex-col justify-between bg-landing"
+        style={{ backgroundImage: `url(${Background.src})` }}
+      >
         <HomeContents />
-        <div className="flex justify-between bg-black/40 py-4 px-8">
+        <div className="flex justify-between py-4 px-8">
           <span>
-            Quickly created by{" "}
-            <a href="https://twitter.com/t3dotgg" className="text-blue-300">
-              Theo
+            Made with &hearts; by{" "}
+            <a
+              href="https://ping.gg"
+              className="font-bold text-pink-300 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ping.gg
             </a>
           </span>
           <div className="flex gap-4">
             <a
-              href="https://github.com/theobr/zapdos"
-              className="text-blue-300"
+              href="https://github.com/t3-oss/zapdos"
+              className="font-bold text-pink-300 hover:underline"
+              target="_blank"
+              rel="noreferrer"
             >
               Github
             </a>
-            <a href="https://t3.gg/discord" className="text-blue-300">
+            <a
+              href="https://ping.gg/discord"
+              className="font-bold text-pink-300 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
               Discord
             </a>
           </div>
