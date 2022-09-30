@@ -286,7 +286,7 @@ const HomeContents = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between bg-gray-900 py-4 px-8 shadow">
+      <div className="flex items-center justify-between bg-gray-900 py-4 px-8">
         <div className="relative text-2xl font-bold">
           Ping Ask{" "}
           <sup className="absolute top-0 left-[calc(100%+.25rem)] text-xs font-extrabold text-pink-400">
