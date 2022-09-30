@@ -99,7 +99,9 @@ const QuestionsView = () => {
                 <h2 className="font-bold">Active Question</h2>
                 <Button
                   className="-m-2 !p-2"
-                  onClick={copyUrlToClipboard(`/embed/`)}
+                  onClick={copyUrlToClipboard(
+                    `/embed/${sesh?.user?.name?.toLowerCase()}`
+                  )}
                   variant="ghost"
                 >
                   <div className="flex items-center">
@@ -111,7 +113,7 @@ const QuestionsView = () => {
               <AutoAnimate className="flex flex-1 items-center justify-center">
                 <span
                   key={selectedQuestion?.id}
-                  className="max-w-md text-lg font-medium"
+                  className="max-w-md break-all text-lg font-medium"
                 >
                   {selectedQuestion?.body}
                 </span>
