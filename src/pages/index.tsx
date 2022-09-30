@@ -1,10 +1,18 @@
+import { PropsWithChildren, useEffect, useState } from "react";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { getZapdosAuthSession } from "../server/common/get-server-session";
-import Background from "../assets/background.svg";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import clsx from "clsx";
+
 import {
-  FaArrowCircleRight,
   FaCaretSquareRight,
   FaCopy,
   FaSignOutAlt,
@@ -14,32 +22,31 @@ import {
   FaSortNumericDown,
   FaTrash,
   FaTwitch,
+  FaWindowRestore,
+  FaQuestionCircle,
+  FaEye,
+  FaEyeSlash,
+  FaArchive,
 } from "react-icons/fa";
-import dynamic from "next/dynamic";
 
-import { trpc } from "../utils/trpc";
+import { getZapdosAuthSession } from "../server/common/get-server-session";
 
-import { FaEye, FaEyeSlash, FaArchive } from "react-icons/fa";
+import Background from "../assets/background.svg";
+import LoadingSVG from "../assets/puff.svg";
+
+import { Button } from "../components/button";
+import { Card } from "../components/card";
+import { AutoAnimate } from "../components/auto-animate";
+
 import {
   PusherProvider,
   useCurrentMemberCount,
   useSubscribeToEvent,
 } from "../utils/pusher";
-
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-dayjs.extend(relativeTime);
-
-import LoadingSVG from "../assets/puff.svg";
-import Image from "next/image";
-import { PropsWithChildren, useEffect, useState } from "react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Button } from "../components/button";
-import { Card } from "../components/card";
-import { AutoAnimate } from "../components/auto-animate";
-import clsx from "clsx";
+import { trpc } from "../utils/trpc";
 
 const QuestionsView = () => {
+  const { data: sesh } = useSession();
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
   // Refetch when new questions come through
   useSubscribeToEvent("new-question", () => refetch());
@@ -84,12 +91,34 @@ const QuestionsView = () => {
 
   return (
     <div className="grid min-h-0 flex-1 grid-cols-3">
-      <div className="col-span-2 flex py-4 pl-6 pr-3">
-        <Card className="flex flex-1 flex-col divide-y divide-gray-800">
-          <AutoAnimate className="flex flex-1 items-center justify-center p-4 text-lg font-medium">
-            <span key={selectedQuestion?.id}>{selectedQuestion?.body}</span>
-          </AutoAnimate>
-          <div className="grid grid-cols-2 divide-x divide-gray-800">
+      <div className="col-span-2 flex py-4 pl-8 pr-4">
+        <Card className="flex flex-1 flex-col divide-y divide-gray-750">
+          <div className="flex flex-1 flex-col p-4">
+            <div className="flex flex-1 flex-col">
+              <div className="flex items-baseline justify-between">
+                <h2 className="font-bold">Active Question</h2>
+                <Button
+                  className="-m-2 !p-2"
+                  onClick={copyUrlToClipboard(`/embed/`)}
+                  variant="ghost"
+                >
+                  <div className="flex items-center">
+                    <FaWindowRestore />
+                    &nbsp; Copy embed url
+                  </div>
+                </Button>
+              </div>
+              <AutoAnimate className="flex flex-1 items-center justify-center">
+                <span
+                  key={selectedQuestion?.id}
+                  className="max-w-md text-lg font-medium"
+                >
+                  {selectedQuestion?.body}
+                </span>
+              </AutoAnimate>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 divide-x divide-gray-750">
             <button
               className="flex items-center justify-center gap-2 rounded-bl p-4 hover:bg-gray-700"
               onClick={() => unpinQuestion()}
@@ -111,53 +140,66 @@ const QuestionsView = () => {
           </div>
         </Card>
       </div>
-      <div className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-3 pr-6">
+      <div className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-4 pr-8">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-1.5 font-medium">
             <span>Questions</span>
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
               {otherQuestions.length}
             </span>
+            <button
+              className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+              onClick={() => setReverseSort(!reverseSort)}
+            >
+              {reverseSort ? <FaSortAmountUp /> : <FaSortAmountDown />}
+            </button>
           </h2>
-          <button
-            className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
-            onClick={() => setReverseSort(!reverseSort)}
+
+          <Button
+            onClick={copyUrlToClipboard(
+              `/ask/${sesh?.user?.name?.toLowerCase()}`
+            )}
+            variant="secondary"
+            size="base"
           >
-            {reverseSort ? <FaSortAmountUp /> : <FaSortAmountDown />}
-          </button>
+            <div className="flex items-center">
+              <FaQuestionCircle />
+              &nbsp; Copy Q&A url
+            </div>
+          </Button>
         </div>
         <AutoAnimate
+          as="ul"
           className={clsx(
             "flex gap-4",
             reverseSort ? "flex-col-reverse" : "flex-col"
           )}
         >
           {otherQuestions.map((q) => (
-            <Card
-              key={q.id}
-              className="relative flex animate-fade-in-down flex-col gap-4 p-4"
-            >
-              <div className="break-words">{q.body}</div>
-              <div className="flex items-center justify-between text-gray-300">
-                <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
+            <li key={q.id}>
+              <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
+                <div className="break-words">{q.body}</div>
+                <div className="flex items-center justify-between text-gray-300">
+                  <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
+                  <button
+                    className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-red-400"
+                    onClick={() => removeQuestion({ questionId: q.id })}
+                  >
+                    <FaTrash />
+                    <span>Remove</span>
+                  </button>
+                </div>
                 <button
-                  className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
-                  onClick={() => removeQuestion({ questionId: q.id })}
+                  className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+                  onClick={() => pinQuestion({ questionId: q.id })}
                 >
-                  <FaTrash />
-                  <span>Remove</span>
+                  <span className="flex items-center gap-1.5">
+                    <FaEye />
+                    Show question
+                  </span>
                 </button>
-              </div>
-              <button
-                className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-                onClick={() => pinQuestion({ questionId: q.id })}
-              >
-                <span className="flex items-center gap-1.5">
-                  <FaEye />
-                  Show question
-                </span>
-              </button>
-            </Card>
+              </Card>
+            </li>
           ))}
         </AutoAnimate>
       </div>
@@ -190,25 +232,24 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: sesh } = useSession();
 
   return (
-    <div className="flex gap-2">
-      <button
-        onClick={copyUrlToClipboard(`/embed/${userId}`)}
-        className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
-      >
-        Copy embed url <FaCopy size={24} />
-      </button>
-      <button
-        onClick={copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`)}
-        className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
-      >
-        Copy Q&A url <FaCopy size={24} />
-      </button>
-      <button
-        onClick={() => signOut()}
-        className="flex gap-2 rounded bg-gray-200 p-4 font-bold text-gray-800 hover:bg-gray-100"
-      >
-        Logout <FaSignOutAlt size={24} />
-      </button>
+    <div className="flex gap-6">
+      <h1 className="flex items-center gap-2 text-base font-medium">
+        {sesh?.user?.image && (
+          <img
+            src={sesh?.user?.image}
+            alt="pro pic"
+            className="w-8 rounded-full"
+          />
+        )}
+        {sesh?.user?.name}
+      </h1>
+
+      <Button onClick={() => signOut()} variant="secondary" size="lg">
+        <div className="flex items-center">
+          <FaSignOutAlt />
+          &nbsp; Logout
+        </div>
+      </Button>
     </div>
   );
 };
@@ -244,16 +285,12 @@ const HomeContents = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex items-center justify-between bg-gray-900 py-4 px-8 shadow">
-        <h1 className="flex items-center gap-2 text-2xl font-bold">
-          {data.user?.image && (
-            <img
-              src={data.user?.image}
-              alt="pro pic"
-              className="w-16 rounded-full"
-            />
-          )}
-          {data.user?.name}
-        </h1>
+        <div className="relative text-2xl font-bold">
+          Ping Ask{" "}
+          <sup className="absolute top-0 left-[calc(100%+.25rem)] text-xs font-extrabold text-pink-400">
+            [BETA]
+          </sup>
+        </div>
         <NavButtons userId={data.user?.id!} />
       </div>
       <LazyQuestionsView />
