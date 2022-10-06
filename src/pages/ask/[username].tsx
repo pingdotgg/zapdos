@@ -6,6 +6,8 @@ import { prisma } from "../../server/db/client";
 import type { User } from "@prisma/client";
 import clsx from "clsx";
 import { LoadingSpinner } from "../../components/loading";
+import Button from "../../components/button";
+import { TextInput } from "../../components/text-input";
 
 const AskForm = (props: { user: User }) => {
   if (!props.user) throw new Error("user exists Next, sorry");
@@ -23,24 +25,23 @@ const AskForm = (props: { user: User }) => {
       <Head>
         <title>{`Ask ${props.user?.name} a question!`}</title>
       </Head>
-      <div className="flex flex-col items-center text-center">
-        <div className="p-14" />
-        <div className="flex w-full max-w-lg flex-col items-center gap-8 rounded border border-gray-500 bg-gray-600 p-8 pt-20">
+      <div className="flex h-screen flex-col items-center justify-center">
+        <div className="relative mb-12 flex w-full max-w-lg flex-col items-center gap-8 rounded border border-gray-750 bg-gray-800 p-8 pt-20">
           {props.user.image && (
             <img
               src={props.user.image}
-              className="fixed top-14 h-28 w-28 rounded-full border-4 border-gray-500"
-              alt="Pro pic"
+              className="absolute -top-14 h-28 w-28 rounded-full border-4 border-gray-800"
+              alt="Profile picture"
             />
           )}
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-medium">
             Ask {props.user?.name} a question!
           </h1>
           {!isSuccess && (
             <>
-              <input
+              <TextInput
                 placeholder="Type something..."
-                className="w-full rounded px-2 py-1 text-center text-lg text-gray-800"
+                className="w-full"
                 type="text"
                 value={question}
                 maxLength={400}
@@ -49,19 +50,15 @@ const AskForm = (props: { user: User }) => {
                   if (e.key === "Enter") handleSubmit();
                 }}
               />
-              <button
-                className="relative flex rounded bg-gray-200 py-2 px-8 font-bold text-gray-800 hover:bg-gray-100"
-                type="button"
+              <Button
                 onClick={handleSubmit}
                 disabled={isLoading}
+                loading={isLoading}
+                size="lg"
+                variant="primary"
               >
-                <span className={clsx({ invisible: isLoading })}>Submit</span>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <LoadingSpinner
-                    className={clsx("h-5 w-5", { invisible: !isLoading })}
-                  />
-                </div>
-              </button>
+                Submit
+              </Button>
             </>
           )}
           {isSuccess && (
@@ -69,13 +66,10 @@ const AskForm = (props: { user: User }) => {
               <div className="rounded px-2 py-1 text-lg">
                 Question submitted!
               </div>
-              <button
-                className="flex rounded bg-gray-200 py-2 px-8 font-bold text-gray-800 hover:bg-gray-100"
-                type="button"
-                onClick={() => reset()}
-              >
+
+              <Button onClick={() => reset()} size="lg">
                 Ask another question
-              </button>
+              </Button>
             </>
           )}
         </div>
