@@ -23,6 +23,34 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signIn(message) {
+      const { user, account, profile, isNewUser } = message;
+
+      // If user is new, notify on discord
+      if (isNewUser) {
+        const socialLink = () => {
+          if (account.provider === "twitch")
+            return `[${profile?.name} (${account.provider})](https://twitch.tv/${profile?.name})`;
+          if (account.provider === "twitter")
+            return `[${profile?.name} (${account.provider})](https://twitter.com/${profile?.name})`;
+          return `${profile?.name} (${account.provider})`;
+        };
+
+        const content = `${socialLink()} just signed in for the first time!`;
+
+        fetch(env.DISCORD_NEW_USER_WEBHOOK as string, {
+          method: "POST",
+          body: JSON.stringify({
+            content,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+    },
+  },
 };
 
 export default NextAuth(authOptions);
