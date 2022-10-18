@@ -90,8 +90,8 @@ const QuestionsView = () => {
   const otherQuestions = data?.filter((q) => q.id !== pinnedId) || [];
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-3">
-      <div className="col-span-2 flex py-4 pl-8 pr-4">
+    <div className="grid min-h-0 flex-1 grid-rows-3 gap-4 p-4 sm:grid-cols-3 sm:grid-rows-1 sm:gap-8 sm:p-8">
+      <div className="row-span-1 flex sm:col-span-2">
         <Card className="flex flex-1 flex-col divide-y divide-gray-750">
           <div className="flex flex-1 flex-col p-4">
             <div className="flex flex-1 flex-col">
@@ -122,13 +122,13 @@ const QuestionsView = () => {
           </div>
           <div className="grid grid-cols-2 divide-x divide-gray-750">
             <button
-              className="flex items-center justify-center gap-2 rounded-bl p-4 hover:bg-gray-700"
+              className="flex items-center justify-center gap-2 rounded-bl p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
               onClick={() => unpinQuestion()}
             >
               <FaEyeSlash /> Hide
             </button>
             <button
-              className="flex items-center justify-center gap-2 rounded-br p-4 hover:bg-gray-700"
+              className="flex items-center justify-center gap-2 rounded-br p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
               onClick={() => {
                 if (selectedQuestion)
                   removeQuestion({ questionId: selectedQuestion.id });
@@ -142,7 +142,7 @@ const QuestionsView = () => {
           </div>
         </Card>
       </div>
-      <div className="col-span-1 flex flex-col gap-4 overflow-y-auto py-4 pl-4 pr-8">
+      <div className="row-span-2 flex flex-col gap-2 sm:col-span-1 sm:row-span-1">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-1.5 font-medium">
             <span>Questions</span>
@@ -173,7 +173,7 @@ const QuestionsView = () => {
         <AutoAnimate
           as="ul"
           className={clsx(
-            "flex gap-4",
+            "flex flex-1 gap-2 overflow-y-scroll rounded-lg bg-gray-950/25 p-2",
             reverseSort ? "flex-col-reverse" : "flex-col"
           )}
         >
@@ -184,7 +184,7 @@ const QuestionsView = () => {
                 <div className="flex items-center justify-between text-gray-300">
                   <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
                   <button
-                    className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50 hover:text-red-400"
+                    className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
                     onClick={() => removeQuestion({ questionId: q.id })}
                   >
                     <FaTrash />
@@ -243,13 +243,13 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
             className="w-8 rounded-full"
           />
         )}
-        {sesh?.user?.name}
+        <span className="sr-only sm:not-sr-only">{sesh?.user?.name}</span>
       </h1>
 
       <Button onClick={() => signOut()} variant="secondary" size="lg">
         <div className="flex items-center">
           <FaSignOutAlt />
-          &nbsp; Logout
+          <span className="sr-only sm:not-sr-only">&nbsp; Logout</span>
         </div>
       </Button>
     </div>
@@ -286,8 +286,8 @@ const HomeContents = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between bg-gray-900 py-4 px-8">
-        <div className="relative text-2xl font-bold">
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 sm:py-4 sm:px-8">
+        <div className="relative whitespace-nowrap text-2xl font-bold">
           Ping Ask{" "}
           <sup className="absolute top-0 left-[calc(100%+.25rem)] text-xs font-extrabold text-pink-400">
             [BETA]
