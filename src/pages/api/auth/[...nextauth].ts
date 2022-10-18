@@ -27,8 +27,8 @@ export const authOptions: NextAuthOptions = {
     async signIn(message) {
       const { user, account, profile, isNewUser } = message;
 
-      // If user is new, notify on discord
-      if (isNewUser) {
+      // If user is new, notify on discord. Don't run if webhook env var is not set
+      if (isNewUser && typeof env.DISCORD_NEW_USER_WEBHOOK === "string") {
         const socialLink = () => {
           if (account.provider === "twitch")
             return `[${profile?.name} (${account.provider})](https://twitch.tv/${profile?.name})`;
@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
 
         const content = `${socialLink()} just signed in for the first time!`;
 
-        fetch(env.DISCORD_NEW_USER_WEBHOOK as string, {
+        fetch(env.DISCORD_NEW_USER_WEBHOOK, {
           method: "POST",
           body: JSON.stringify({
             content,

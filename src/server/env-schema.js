@@ -14,7 +14,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_PUSHER_SERVER_TLS: z.string(),
   NEXT_PUBLIC_PUSHER_SERVER_CLUSTER: z.string().default(null).optional(),
   PUSHER_APP_SECRET: z.string(),
-  DISCORD_NEW_USER_WEBHOOK: z.string(),
+  DISCORD_NEW_USER_WEBHOOK: z.string().optional(),
 });
 
 module.exports.envSchema = envSchema;
