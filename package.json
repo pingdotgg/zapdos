@@ -22,6 +22,7 @@
     "dayjs": "^1.11.3",
     "next": "12.2.1",
     "next-auth": "^4.10.0",
+    "next-plausible": "^3.6.3",
     "pusher": "^5.1.1-beta",
     "pusher-js": "^7.1.1-beta",
     "react": "18.2.0",
