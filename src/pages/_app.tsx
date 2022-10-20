@@ -12,7 +12,7 @@ const MyApp: AppType = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <PlausibleProvider domain="ask.ping.com">
+    <PlausibleProvider domain="ask.ping.gg">
       <SessionProvider session={session}>
         <Component {...pageProps} />
       </SessionProvider>
