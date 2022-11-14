@@ -1,4 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import input from "postcss/lib/input";
+import { pusherServerClient } from "../../../server/common/pusher";
 import { prisma } from "../../../server/db/client";
 
 const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -55,6 +57,9 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
       userId: user.id,
     },
   });
+
+  // inform client of new question
+  await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
   res.status(200).end();
 };
