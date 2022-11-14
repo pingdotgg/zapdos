@@ -49,14 +49,14 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const question = messageData.message.content.match(/(?<=\s).*/)[0];
 
   // insert question into database
-  prisma.question.create({
+  await prisma.question.create({
     data: {
       body: question,
       userId: user.id,
     },
   });
 
-  res.status(200);
+  res.status(200).end();
 };
 
 export default handleRequest;
