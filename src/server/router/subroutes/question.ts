@@ -83,4 +83,16 @@ export const newQuestionRouter = t.router({
       {}
     );
   }),
+
+  getAnswered: protectedProcedure.query(async ({ ctx }) => {
+    const questions = await ctx.prisma.question.findMany({
+      where: {
+        userId: ctx.session.user.id,
+        status: "ANSWERED",
+      },
+      orderBy: { id: "asc" },
+    });
+
+    return questions;
+  }),
 });

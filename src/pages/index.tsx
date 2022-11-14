@@ -48,6 +48,9 @@ import { trpc } from "../utils/trpc";
 const QuestionsView = () => {
   const { data: sesh } = useSession();
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
+
+  const { data: answeredQuestions } =
+    trpc.proxy.questions.getAnswered.useQuery();
   // Refetch when new questions come through
   useSubscribeToEvent("new-question", () => refetch());
 
@@ -76,8 +79,16 @@ const QuestionsView = () => {
         ["questions.getAll", null],
         data?.filter((q) => q.id !== questionId)
       );
+      tctx.queryClient.setQueryData(
+        ["questions.getAnswered", null],
+        [...(answeredQuestions ?? []), data?.find((q) => q.id === questionId)]
+      );
     },
   });
+
+  const [selectedList, setSelectedList] = useState<"answered" | "unanswered">(
+    "unanswered"
+  );
 
   if (isLoading)
     return (
@@ -145,10 +156,30 @@ const QuestionsView = () => {
       <div className="row-span-2 flex flex-col gap-2 sm:col-span-1 sm:row-span-1">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-1.5 font-medium">
-            <span>Questions</span>
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
-              {otherQuestions.length}
-            </span>
+            <button
+              className={clsx(
+                "flex items-center gap-1.5  px-2 py-1",
+                selectedList === "unanswered" && "rounded-md bg-gray-950/25"
+              )}
+              onClick={() => setSelectedList("unanswered")}
+            >
+              <span>Unanswered</span>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
+                {otherQuestions.length}
+              </span>
+            </button>
+            <button
+              className={clsx(
+                "flex items-center gap-1.5  px-2 py-1",
+                selectedList === "answered" && "rounded-md bg-gray-950/25"
+              )}
+              onClick={() => setSelectedList("answered")}
+            >
+              <span>Answered</span>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
+                {answeredQuestions?.length}
+              </span>
+            </button>
             <button
               className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
               onClick={() => setReverseSort(!reverseSort)}
@@ -177,32 +208,47 @@ const QuestionsView = () => {
             reverseSort ? "flex-col-reverse" : "flex-col"
           )}
         >
-          {otherQuestions.map((q) => (
-            <li key={q.id}>
-              <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
-                <div className="break-words">{q.body}</div>
-                <div className="flex items-center justify-between text-gray-300">
-                  <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
-                  <button
-                    className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
-                    onClick={() => removeQuestion({ questionId: q.id })}
-                  >
-                    <FaTrash />
-                    <span>Remove</span>
-                  </button>
-                </div>
-                <button
-                  className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-                  onClick={() => pinQuestion({ questionId: q.id })}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <FaEye />
-                    Show question
-                  </span>
-                </button>
-              </Card>
-            </li>
-          ))}
+          {selectedList === "unanswered"
+            ? otherQuestions.map((q) => (
+                <li key={q.id}>
+                  <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
+                    <div className="break-words">{q.body}</div>
+                    <div className="flex items-center justify-between text-gray-300">
+                      <div className="text-sm">
+                        {dayjs(q.createdAt).fromNow()}
+                      </div>
+                      <button
+                        className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
+                        onClick={() => removeQuestion({ questionId: q.id })}
+                      >
+                        <FaTrash />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                    <button
+                      className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+                      onClick={() => pinQuestion({ questionId: q.id })}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <FaEye />
+                        Show question
+                      </span>
+                    </button>
+                  </Card>
+                </li>
+              ))
+            : answeredQuestions?.map((q) => (
+                <li key={q.id}>
+                  <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
+                    <div className="break-words">{q.body}</div>
+                    <div className="flex items-center justify-between text-gray-300">
+                      <div className="text-sm">
+                        {dayjs(q.createdAt).fromNow()}
+                      </div>
+                    </div>
+                  </Card>
+                </li>
+              ))}
         </AutoAnimate>
       </div>
     </div>
