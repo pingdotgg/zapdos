@@ -89,6 +89,10 @@ const QuestionsView = () => {
   const selectedQuestion = data?.find((q) => q.id === pinnedId);
   const otherQuestions = data?.filter((q) => q.id !== pinnedId) || [];
 
+  const otherQuestionsSorted = reverseSort
+    ? [...otherQuestions].reverse()
+    : otherQuestions;
+
   return (
     <div className="grid min-h-0 flex-1 grid-rows-3 gap-4 p-4 sm:grid-cols-3 sm:grid-rows-1 sm:gap-8 sm:p-8">
       <div className="row-span-1 flex sm:col-span-2">
@@ -172,12 +176,9 @@ const QuestionsView = () => {
         </div>
         <AutoAnimate
           as="ul"
-          className={clsx(
-            "flex flex-1 gap-2 overflow-y-scroll rounded-lg bg-gray-950/25 p-2",
-            reverseSort ? "flex-col-reverse" : "flex-col"
-          )}
+          className="flex flex-1 flex-col gap-2 overflow-y-scroll rounded-lg bg-gray-950/25 p-2"
         >
-          {otherQuestions.map((q) => (
+          {otherQuestionsSorted.map((q) => (
             <li key={q.id}>
               <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
                 <div className="break-words">{q.body}</div>
