@@ -49,8 +49,7 @@ const QuestionsView = () => {
   const { data: sesh } = useSession();
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
 
-  const { data: answeredQuestions } =
-    trpc.proxy.questions.getAnswered.useQuery();
+  const { data: answered } = trpc.proxy.questions.getAnswered.useQuery();
   // Refetch when new questions come through
   useSubscribeToEvent("new-question", () => refetch());
 
@@ -81,7 +80,7 @@ const QuestionsView = () => {
       );
       tctx.queryClient.setQueryData(
         ["questions.getAnswered", null],
-        [...(answeredQuestions ?? []), data?.find((q) => q.id === questionId)]
+        [...(answered ?? []), data?.find((q) => q.id === questionId)]
       );
     },
   });
@@ -99,11 +98,12 @@ const QuestionsView = () => {
 
   const selectedQuestion = data?.find((q) => q.id === pinnedId);
   const otherQuestions = data?.filter((q) => q.id !== pinnedId) || [];
+  const answeredQuestions = answered || [];
 
   const otherQuestionsSorted = reverseSort
     ? [...otherQuestions].reverse()
     : otherQuestions;
-    
+
   const answeredQuestionsSorted = reverseSort
     ? [...answeredQuestions].reverse()
     : answeredQuestions;
