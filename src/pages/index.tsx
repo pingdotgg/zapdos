@@ -27,6 +27,7 @@ import {
   FaEye,
   FaEyeSlash,
   FaArchive,
+  FaEllipsisV,
 } from "react-icons/fa";
 
 import { getZapdosAuthSession } from "../server/common/get-server-session";
@@ -44,6 +45,7 @@ import {
   useSubscribeToEvent,
 } from "../utils/pusher";
 import { trpc } from "../utils/trpc";
+import Dropdown from "../components/dropdown";
 
 const QuestionsView = () => {
   const { data: sesh } = useSession();
@@ -108,10 +110,7 @@ const QuestionsView = () => {
                   )}
                   variant="ghost"
                 >
-                  <div className="flex items-center">
-                    <FaWindowRestore />
-                    &nbsp; Copy embed url
-                  </div>
+                  <div className="flex items-center">Setup with OBS</div>
                 </Button>
               </div>
               <AutoAnimate className="flex flex-1 items-center justify-center">
@@ -161,18 +160,25 @@ const QuestionsView = () => {
             </button>
           </h2>
 
-          <Button
-            onClick={copyUrlToClipboard(
-              `/ask/${sesh?.user?.name?.toLowerCase()}`
-            )}
-            variant="secondary"
-            size="base"
+          <Dropdown
+            items={[
+              {
+                label: "Archived Questions",
+                onClick: () => {},
+              },
+              {
+                label: "Get Question Link",
+                onClick: () => {},
+              },
+            ]}
+            placement="bottom-end"
           >
-            <div className="flex items-center">
-              <FaQuestionCircle />
-              &nbsp; Copy Q&A url
-            </div>
-          </Button>
+            <Button variant="secondary">
+              <div className="flex items-center">
+                <FaEllipsisV className="-mx-1.5" />
+              </div>
+            </Button>
+          </Dropdown>
         </div>
         <AutoAnimate
           as="ul"
