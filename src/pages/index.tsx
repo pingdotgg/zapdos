@@ -115,12 +115,18 @@ const QuestionsView = () => {
                 </Button>
               </div>
               <AutoAnimate className="flex flex-1 items-center justify-center">
-                <span
-                  key={selectedQuestion?.id}
-                  className="max-w-md break-all text-lg font-medium"
-                >
-                  {selectedQuestion?.body}
-                </span>
+                {selectedQuestion ? (
+                  <span
+                    key={selectedQuestion?.id}
+                    className="max-w-md break-all text-lg font-medium"
+                  >
+                    {selectedQuestion?.body}
+                  </span>
+                ) : (
+                  <span className="text-sm font-medium text-gray-600">
+                    No active question
+                  </span>
+                )}
               </AutoAnimate>
             </div>
           </div>
@@ -174,36 +180,62 @@ const QuestionsView = () => {
             </div>
           </Button>
         </div>
-        <AutoAnimate
-          as="ul"
-          className="flex flex-1 flex-col gap-2 overflow-y-scroll rounded-lg bg-gray-950/25 p-2"
-        >
-          {otherQuestionsSorted.map((q) => (
-            <li key={q.id}>
-              <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
-                <div className="break-words">{q.body}</div>
-                <div className="flex items-center justify-between text-gray-300">
-                  <div className="text-sm">{dayjs(q.createdAt).fromNow()}</div>
-                  <button
-                    className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
-                    onClick={() => removeQuestion({ questionId: q.id })}
-                  >
-                    <FaTrash />
-                    <span>Remove</span>
-                  </button>
-                </div>
-                <button
-                  className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-                  onClick={() => pinQuestion({ questionId: q.id })}
+        <AutoAnimate className="flex min-h-0 flex-1 flex-col rounded-lg bg-gray-950/25">
+          {otherQuestionsSorted.length > 0 ? (
+            <AutoAnimate
+              as="ul"
+              className="flex flex-col gap-2 overflow-y-auto p-2"
+            >
+              {otherQuestionsSorted.map((q) => (
+                <li key={q.id}>
+                  <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
+                    <div className="break-words">{q.body}</div>
+                    <div className="flex items-center justify-between text-gray-300">
+                      <div className="text-sm">
+                        {dayjs(q.createdAt).fromNow()}
+                      </div>
+                      <button
+                        className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
+                        onClick={() => removeQuestion({ questionId: q.id })}
+                      >
+                        <FaTrash />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                    <button
+                      className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+                      onClick={() => pinQuestion({ questionId: q.id })}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <FaEye />
+                        Show question
+                      </span>
+                    </button>
+                  </Card>
+                </li>
+              ))}
+            </AutoAnimate>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center p-2 text-gray-500">
+              <FaQuestionCircle size="80" />
+              <h3 className="mt-6 text-lg font-medium text-gray-400">
+                {"It's awfully quiet here..."}
+              </h3>
+              <p className="mt-1 text-sm ">
+                Share the Q&A link to get some questions
+              </p>
+              <div className="mt-6">
+                <Button
+                  variant="primary"
+                  onClick={copyUrlToClipboard(
+                    `/ask/${sesh?.user?.name?.toLowerCase()}`
+                  )}
                 >
-                  <span className="flex items-center gap-1.5">
-                    <FaEye />
-                    Show question
-                  </span>
-                </button>
-              </Card>
-            </li>
-          ))}
+                  Copy Q&A Link
+                </Button>
+              </div>
+            </div>
+          )}
         </AutoAnimate>
       </div>
     </div>
