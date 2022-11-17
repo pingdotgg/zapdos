@@ -1,0 +1,20 @@
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32">
+  <defs>
+    <style>
+      .background {
+        fill: #fff;
+      }
+      .foreground {
+        fill: url(#linear-gradient);
+      }
+    </style>
+    <linearGradient id="linear-gradient" y1="16.33" x2="32" y2="16.33" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e24a8d" />
+      <stop offset="1" stop-color="#e96ea4" />
+    </linearGradient>
+  </defs>
+  <path class="background"
+    d="M27.39.66H4.61A4.6,4.6,0,0,0,0,5.26V23.2a4.61,4.61,0,0,0,4.61,4.61h5.1a4.28,4.28,0,0,0,8.56,0h9.12A4.61,4.61,0,0,0,32,23.2V5.26A4.6,4.6,0,0,0,27.39.66Z" />
+  <path class="foreground"
+    d="M27.39.66H4.61A4.6,4.6,0,0,0,0,5.26V23.2a4.61,4.61,0,0,0,4.61,4.61h5.1a4.28,4.28,0,0,0,8.56,0h9.12A4.61,4.61,0,0,0,32,23.2V5.26A4.6,4.6,0,0,0,27.39.66Zm-17.91,20a2.44,2.44,0,0,1-4.87,0V12.48a2.44,2.44,0,1,1,4.87,0Zm17.91-.43a2.87,2.87,0,0,1-2.87,2.85h-.25A2.87,2.87,0,0,1,22,21.93l0,0-5.5-8V27.73a2.44,2.44,0,0,1-4.88,0V8A2.87,2.87,0,0,1,14.4,5.16h.28A3,3,0,0,1,17,6.36l0,.07,5.46,7.89V12.38a2.44,2.44,0,1,1,4.87,0Z" />
+</svg>
