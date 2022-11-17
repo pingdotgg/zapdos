@@ -115,12 +115,18 @@ const QuestionsView = () => {
                 </Button>
               </div>
               <AutoAnimate className="flex flex-1 items-center justify-center">
-                <span
-                  key={selectedQuestion?.id}
-                  className="max-w-md break-all text-lg font-medium"
-                >
-                  {selectedQuestion?.body}
-                </span>
+                {selectedQuestion ? (
+                  <span
+                    key={selectedQuestion?.id}
+                    className="max-w-md break-all text-lg font-medium"
+                  >
+                    {selectedQuestion?.body}
+                  </span>
+                ) : (
+                  <span className="text-sm font-medium text-gray-600">
+                    No active question
+                  </span>
+                )}
               </AutoAnimate>
             </div>
           </div>
