@@ -123,7 +123,7 @@ const QuestionsView = () => {
                 <Button
                   className="-m-2 !p-2"
                   onClick={() => {
-                    plausible("copiedEmbedUrl", {
+                    plausible("Copied Embed URL", {
                       props: {
                         location: "activeQuestion",
                       },
@@ -199,7 +199,7 @@ const QuestionsView = () => {
 
           <Button
             onClick={() => {
-              plausible("copiedQaUrl", {
+              plausible("Copied Q&A URL", {
                 props: {
                   location: "questionsMenu",
                 },
@@ -273,7 +273,7 @@ const QuestionsView = () => {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    plausible("copiedQaUrl", {
+                    plausible("Copied Q&A URL", {
                       props: {
                         location: "questionsEmptyState",
                       },
