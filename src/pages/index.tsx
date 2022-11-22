@@ -361,6 +361,14 @@ const Home: NextPage = () => {
           </span>
           <div className="flex gap-4">
             <a
+              href="https://discord.gg/qQuFcZKJj3"
+              className="font-bold text-pink-300 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Feedback
+            </a>
+            <a
               href="https://github.com/t3-oss/zapdos"
               className="font-bold text-pink-300 hover:underline"
               target="_blank"
