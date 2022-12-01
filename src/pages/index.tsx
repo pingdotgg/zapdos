@@ -103,9 +103,7 @@ const QuestionsView = () => {
                 <h2 className="font-bold">Active Question</h2>
                 <Button
                   className="-m-2 !p-2"
-                  onClick={copyUrlToClipboard(
-                    `/embed/${sesh?.user?.name?.toLowerCase()}`
-                  )}
+                  onClick={copyUrlToClipboard(`/embed/${sesh?.user?.id}`)}
                   variant="ghost"
                 >
                   <div className="flex items-center">
