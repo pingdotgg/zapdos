@@ -49,6 +49,18 @@ export const authOptions: NextAuthOptions = {
           },
         });
       }
+
+      // Updates user record with latest image
+      if (user.id) {
+        await prisma.user.update({
+          where: {
+            id: user.id as string,
+          },
+          data: {
+            image: profile?.image,
+          },
+        });
+      }
     },
   },
 };
