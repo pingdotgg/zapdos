@@ -60,7 +60,8 @@ const QuestionsView = () => {
     variables: currentlyPinned, // The "variables" passed are the currently pinned Q
     reset: resetPinnedQuestionMutation, // The reset allows for "unpinning" on client
   } = trpc.proxy.questions.pin.useMutation();
-  const pinnedId = currentlyPinned?.questionId;
+  const pinnedId =
+    currentlyPinned?.questionId ?? data?.find((q) => q.status === "PINNED")?.id;
 
   const { mutate: unpinQuestion } = trpc.proxy.questions.unpin.useMutation({
     onMutate: () => {
