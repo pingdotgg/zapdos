@@ -34,7 +34,14 @@ export const newQuestionRouter = t.router({
     const questions = await ctx.prisma.question.findMany({
       where: {
         userId: ctx.session.user.id,
-        status: "PENDING",
+        OR: [
+          {
+            status: "PENDING",
+          },
+          {
+            status: "PINNED",
+          },
+        ],
       },
       orderBy: { id: "asc" },
     });
@@ -54,6 +61,18 @@ export const newQuestionRouter = t.router({
           code: "UNAUTHORIZED",
         });
       }
+
+      await ctx.prisma.question.updateMany({
+        where: { userId: ctx.session.user.id, status: "PINNED" },
+        data: {
+          status: "PENDING",
+        },
+      });
+
+      await ctx.prisma.question.update({
+        where: { id: input.questionId },
+        data: { status: "PINNED" },
+      });
 
       await pusherServerClient.trigger(
         `user-${question.userId}`,

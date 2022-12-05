@@ -1,11 +1,19 @@
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from "next/types";
 
 import React, { useState } from "react";
 import { PusherProvider, useSubscribeToEvent } from "../../utils/pusher";
+import { prisma } from "../../server/db/client";
 
-const useLatestPusherMessage = (userId: string) => {
-  const [latestMessage, setLatestMessage] = useState<string | null>(null);
+type ServerSideProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+const useLatestPusherMessage = (pinnedQuestion: string | null) => {
+  const [latestMessage, setLatestMessage] = useState<string | null>(
+    pinnedQuestion
+  );
 
   useSubscribeToEvent("question-pinned", (data: { question: string }) =>
     setLatestMessage(data.question)
@@ -15,8 +23,10 @@ const useLatestPusherMessage = (userId: string) => {
   return latestMessage;
 };
 
-const BrowserEmbedViewCore: React.FC<{ userId: string }> = ({ userId }) => {
-  const latestMessage = useLatestPusherMessage(userId);
+const BrowserEmbedViewCore: React.FC<ServerSideProps> = ({
+  pinnedQuestion,
+}) => {
+  const latestMessage = useLatestPusherMessage(pinnedQuestion ?? null);
 
   if (!latestMessage) return null;
 
@@ -32,25 +42,39 @@ const BrowserEmbedViewCore: React.FC<{ userId: string }> = ({ userId }) => {
   );
 };
 
-const BrowserEmbedView: React.FC<{ userId: string }> = (props) => {
+const LazyEmbedView = dynamic(() => Promise.resolve(BrowserEmbedViewCore), {
+  ssr: false,
+});
+
+const BrowserEmbedView: React.FC<ServerSideProps> = (props) => {
+  if (!props.userId) return null;
+
   return (
     <PusherProvider slug={`user-${props.userId}`}>
-      <BrowserEmbedViewCore {...props} />
+      <LazyEmbedView {...props} />
     </PusherProvider>
   );
 };
 
-const LazyEmbedView = dynamic(() => Promise.resolve(BrowserEmbedView), {
-  ssr: false,
-});
+export default BrowserEmbedView;
 
-const BrowserEmbedQuestionView = () => {
-  const { query } = useRouter();
-  if (!query.uid || typeof query.uid !== "string") {
-    return null;
-  }
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const uid = context.query.uid;
 
-  return <LazyEmbedView userId={query.uid} />;
+  if (typeof uid !== "string") return { props: { success: false } };
+
+  const pinnedQuestion = await prisma.question
+    .findFirst({
+      where: { userId: uid, status: "PINNED" },
+    })
+    .then((question) => question?.body);
+
+  return {
+    props: {
+      userId: uid,
+      pinnedQuestion: pinnedQuestion ?? null,
+    },
+  };
 };
-
-export default BrowserEmbedQuestionView;

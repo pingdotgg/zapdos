@@ -202,7 +202,9 @@ const QuestionsView = () => {
                     </div>
                     <button
                       className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-                      onClick={() => pinQuestion({ questionId: q.id })}
+                      onClick={() => {
+                        pinQuestion({ questionId: q.id });
+                      }}
                     >
                       <span className="flex items-center gap-1.5">
                         <FaEye />

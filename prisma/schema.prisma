@@ -13,6 +13,7 @@ datasource db {
 
 enum QuestionStatus {
     PENDING
+    PINNED
     ANSWERED
 }
 
