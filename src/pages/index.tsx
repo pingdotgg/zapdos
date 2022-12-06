@@ -128,9 +128,7 @@ const QuestionsView = () => {
                         location: "activeQuestion",
                       },
                     });
-                    copyUrlToClipboard(
-                      `/embed/${sesh?.user?.name?.toLowerCase()}`
-                    );
+                    copyUrlToClipboard(`/embed/${sesh?.user?.id}`);
                   }}
                   variant="ghost"
                 >
@@ -310,7 +308,7 @@ const LazyQuestionsView = dynamic(() => Promise.resolve(QuestionsViewWrapper), {
   ssr: false,
 });
 
-const copyUrlToClipboard = (path: string) => () => {
+const copyUrlToClipboard = (path: string) => {
   if (!process.browser) return;
   navigator.clipboard.writeText(`${window.location.origin}${path}`);
 };
