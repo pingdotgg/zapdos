@@ -1,32 +1,25 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import { useState } from "react";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { signIn, signOut, useSession } from "next-auth/react";
-
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import clsx from "clsx";
+import { usePlausible } from "next-plausible";
 
 import {
   FaCaretSquareRight,
-  FaCopy,
   FaSignOutAlt,
-  FaSortAlphaDown,
   FaSortAmountDown,
   FaSortAmountUp,
-  FaSortNumericDown,
   FaTrash,
   FaTwitch,
   FaWindowRestore,
   FaQuestionCircle,
   FaEye,
   FaEyeSlash,
-  FaArchive,
 } from "react-icons/fa";
 
 import { getZapdosAuthSession } from "../server/common/get-server-session";
@@ -48,6 +41,9 @@ import { trpc } from "../utils/trpc";
 const QuestionsView = () => {
   const { data: sesh } = useSession();
   const { data, isLoading, refetch } = trpc.proxy.questions.getAll.useQuery();
+
+  const plausible = usePlausible();
+
   // Refetch when new questions come through
   useSubscribeToEvent("new-question", () => refetch());
 
@@ -56,7 +52,7 @@ const QuestionsView = () => {
 
   // Question pinning mutation
   const {
-    mutate: pinQuestion,
+    mutate: pinQuestionMutation,
     variables: currentlyPinned, // The "variables" passed are the currently pinned Q
     reset: resetPinnedQuestionMutation, // The reset allows for "unpinning" on client
   } = trpc.proxy.questions.pin.useMutation();
@@ -70,15 +66,38 @@ const QuestionsView = () => {
   });
 
   const tctx = trpc.useContext();
-  const { mutate: removeQuestion } = trpc.proxy.questions.archive.useMutation({
-    onMutate: ({ questionId }) => {
-      // Optimistic update
-      tctx.queryClient.setQueryData(
-        ["questions.getAll", null],
-        data?.filter((q) => q.id !== questionId)
-      );
-    },
-  });
+  const { mutate: removeQuestionMutation } =
+    trpc.proxy.questions.archive.useMutation({
+      onMutate: ({ questionId }) => {
+        // Optimistic update
+        tctx.queryClient.setQueryData(
+          ["questions.getAll", null],
+          data?.filter((q) => q.id !== questionId)
+        );
+      },
+    });
+
+  const removeQuestion = async ({
+    questionId,
+    location,
+  }: {
+    questionId: string;
+    location: string;
+  }) => {
+    await removeQuestionMutation({ questionId });
+    plausible("Remove Question", { props: { location } });
+  };
+
+  const pinQuestion = async ({
+    questionId,
+    location,
+  }: {
+    questionId: string;
+    location: string;
+  }) => {
+    await pinQuestionMutation({ questionId });
+    plausible("Pin Question", { props: { location } });
+  };
 
   if (isLoading)
     return (
@@ -104,7 +123,14 @@ const QuestionsView = () => {
                 <h2 className="font-bold">Active Question</h2>
                 <Button
                   className="-m-2 !p-2"
-                  onClick={copyUrlToClipboard(`/embed/${sesh?.user?.id}`)}
+                  onClick={() => {
+                    plausible("Copied Embed URL", {
+                      props: {
+                        location: "activeQuestion",
+                      },
+                    });
+                    copyUrlToClipboard(`/embed/${sesh?.user?.id}`);
+                  }}
                   variant="ghost"
                 >
                   <div className="flex items-center">
@@ -140,9 +166,13 @@ const QuestionsView = () => {
               className="flex items-center justify-center gap-2 rounded-br p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
               onClick={() => {
                 if (selectedQuestion)
-                  removeQuestion({ questionId: selectedQuestion.id });
+                  removeQuestion({
+                    questionId: selectedQuestion.id,
+                    location: "nextButton",
+                  });
                 const next = otherQuestions[0]?.id;
-                if (next) pinQuestion({ questionId: next });
+                if (next)
+                  pinQuestion({ questionId: next, location: "nextButton" });
               }}
             >
               <FaCaretSquareRight />
@@ -167,9 +197,14 @@ const QuestionsView = () => {
           </h2>
 
           <Button
-            onClick={copyUrlToClipboard(
-              `/ask/${sesh?.user?.name?.toLowerCase()}`
-            )}
+            onClick={() => {
+              plausible("Copied Q&A URL", {
+                props: {
+                  location: "questionsMenu",
+                },
+              });
+              copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`);
+            }}
             variant="secondary"
             size="base"
           >
@@ -195,7 +230,12 @@ const QuestionsView = () => {
                       </div>
                       <button
                         className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
-                        onClick={() => removeQuestion({ questionId: q.id })}
+                        onClick={() =>
+                          removeQuestion({
+                            questionId: q.id,
+                            location: "questionsList",
+                          })
+                        }
                       >
                         <FaTrash />
                         <span>Remove</span>
@@ -203,9 +243,12 @@ const QuestionsView = () => {
                     </div>
                     <button
                       className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-                      onClick={() => {
-                        pinQuestion({ questionId: q.id });
-                      }}
+                      onClick={() =>
+                        pinQuestion({
+                          questionId: q.id,
+                          location: "questionsList",
+                        })
+                      }
                     >
                       <span className="flex items-center gap-1.5">
                         <FaEye />
@@ -228,9 +271,16 @@ const QuestionsView = () => {
               <div className="mt-6">
                 <Button
                   variant="primary"
-                  onClick={copyUrlToClipboard(
-                    `/ask/${sesh?.user?.name?.toLowerCase()}`
-                  )}
+                  onClick={() => {
+                    plausible("Copied Q&A URL", {
+                      props: {
+                        location: "questionsEmptyState",
+                      },
+                    });
+                    copyUrlToClipboard(
+                      `/ask/${sesh?.user?.name?.toLowerCase()}`
+                    );
+                  }}
                 >
                   Copy Q&A Link
                 </Button>
@@ -259,7 +309,7 @@ const LazyQuestionsView = dynamic(() => Promise.resolve(QuestionsViewWrapper), {
   ssr: false,
 });
 
-const copyUrlToClipboard = (path: string) => () => {
+const copyUrlToClipboard = (path: string) => {
   if (!process.browser) return;
   navigator.clipboard.writeText(`${window.location.origin}${path}`);
 };
