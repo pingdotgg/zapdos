@@ -10,9 +10,9 @@ import { prisma } from "../../server/db/client";
 
 type ServerSideProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-const useLatestPusherMessage = (pinnedQuestion: string | null) => {
+const useLatestPusherMessage = (initialPinnedQuestion: string | null) => {
   const [latestMessage, setLatestMessage] = useState<string | null>(
-    pinnedQuestion
+    initialPinnedQuestion
   );
 
   useSubscribeToEvent("question-pinned", (data: { question: string }) =>
