@@ -21,6 +21,7 @@ import {
   FaEye,
   FaEyeSlash,
   FaEllipsisV,
+  FaTimes,
 } from "react-icons/fa";
 
 import { getZapdosAuthSession } from "../server/common/get-server-session";
@@ -39,6 +40,7 @@ import {
 } from "../utils/pusher";
 import { trpc } from "../utils/trpc";
 import Dropdown from "../components/dropdown";
+import { Modal } from "../components/modal";
 
 const QuestionsView = () => {
   const { data: sesh } = useSession();
@@ -100,6 +102,8 @@ const QuestionsView = () => {
     plausible("Pin Question", { props: { location } });
   };
 
+  const modalState = useState(false);
+
   if (isLoading)
     return (
       <div className="flex animate-fade-in-delay justify-center p-8">
@@ -115,192 +119,223 @@ const QuestionsView = () => {
     : otherQuestions;
 
   return (
-    <div className="grid min-h-0 flex-1 grid-rows-3 gap-4 p-4 sm:grid-cols-3 sm:grid-rows-1 sm:gap-8 sm:p-8">
-      <div className="row-span-1 flex sm:col-span-2">
-        <Card className="flex flex-1 flex-col divide-y divide-gray-750">
-          <div className="flex flex-1 flex-col p-4">
-            <div className="flex flex-1 flex-col">
-              <div className="flex items-baseline justify-between">
-                <h2 className="font-bold">Active Question</h2>
-                <Button
-                  className="-m-2 !p-2"
-                  onClick={() => {
-                    plausible("Copied Embed URL", {
-                      props: {
-                        location: "activeQuestion",
-                      },
-                    });
-                    copyUrlToClipboard(`/embed/${sesh?.user?.id}`);
-                  }}
-                  variant="ghost"
-                >
-                  <div className="flex items-center">
-                    <FaWindowRestore />
-                    &nbsp; Copy embed url
-                  </div>
-                </Button>
-              </div>
-              <AutoAnimate className="flex flex-1 items-center justify-center">
-                {selectedQuestion ? (
-                  <span
-                    key={selectedQuestion?.id}
-                    className="max-w-md break-all text-lg font-medium"
-                  >
-                    {selectedQuestion?.body}
-                  </span>
-                ) : (
-                  <span className="text-sm font-medium text-gray-600">
-                    No active question
-                  </span>
-                )}
-              </AutoAnimate>
+    <>
+      <Modal openState={modalState}>
+        <Card>
+          <div className="flex flex-col p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold">Chat Bots</h2>
+              <FaTimes
+                onClick={() => modalState[1](false)}
+                className="cursor-pointer"
+              />
             </div>
-          </div>
-          <div className="grid grid-cols-2 divide-x divide-gray-750">
-            <button
-              className="flex items-center justify-center gap-2 rounded-bl p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
-              onClick={() => unpinQuestion()}
-            >
-              <FaEyeSlash /> Hide
-            </button>
-            <button
-              className="flex items-center justify-center gap-2 rounded-br p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
-              onClick={() => {
-                if (selectedQuestion)
-                  removeQuestion({
-                    questionId: selectedQuestion.id,
-                    location: "nextButton",
-                  });
-                const next = otherQuestions[0]?.id;
-                if (next)
-                  pinQuestion({ questionId: next, location: "nextButton" });
-              }}
-            >
-              <FaCaretSquareRight />
-              Next Question
-            </button>
+            <p className="text-sm text-gray-600">
+              Ping Ask currently supports integration with Fossabot, Nightbot,
+              and StreamElements. To use: Create a custom command on Fossabot
+              with the response
+              <pre>$(customapi https://ask.ping.gg/api/external/fossabot)</pre>
+              Any messages sent to this command on your channel will be added to
+              your question queue. Nightbot:
+              <pre>
+                $(urlfetch
+                https://ask.ping.gg/api/external/chatbots?q=$(querystring)&channel=$(channel)&user=$(user))
+              </pre>
+              StreamElements:
+              <pre></pre>
+            </p>
           </div>
         </Card>
-      </div>
-      <div className="row-span-2 flex flex-col gap-2 sm:col-span-1 sm:row-span-1">
-        <div className="flex items-center justify-between">
-          <h2 className="flex items-center gap-1.5 font-medium">
-            <span>Questions</span>
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
-              {otherQuestions.length}
-            </span>
-            <button
-              className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
-              onClick={() => setReverseSort(!reverseSort)}
-            >
-              {reverseSort ? <FaSortAmountUp /> : <FaSortAmountDown />}
-            </button>
-          </h2>
-
-          <Dropdown
-            placement="bottom-end"
-            trigger={
-              <Button variant="secondary" size="base">
-                <FaEllipsisV />
-              </Button>
-            }
-            items={[
-              {
-                label: "Copy Q&A URL",
-                onClick: () => {
-                  plausible("Copied Q&A URL", {
-                    props: {
-                      location: "questionsMenu",
-                    },
-                  });
-                  copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`);
-                },
-              },
-              {
-                label: "Set up Chat Bot",
-                onClick: () => {
-                  //open modal
-                },
-              },
-            ]}
-          />
-        </div>
-        <AutoAnimate className="flex min-h-0 flex-1 flex-col rounded-lg bg-gray-950/25">
-          {otherQuestionsSorted.length > 0 ? (
-            <AutoAnimate
-              as="ul"
-              className="flex flex-col gap-2 overflow-y-auto p-2"
-            >
-              {otherQuestionsSorted.map((q) => (
-                <li key={q.id}>
-                  <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
-                    <div className="break-words">{q.body}</div>
-                    <div className="flex items-center justify-between text-gray-300">
-                      <div className="text-sm">
-                        {dayjs(q.createdAt).fromNow()}
-                      </div>
-                      <button
-                        className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
-                        onClick={() =>
-                          removeQuestion({
-                            questionId: q.id,
-                            location: "questionsList",
-                          })
-                        }
-                      >
-                        <FaTrash />
-                        <span>Remove</span>
-                      </button>
+      </Modal>
+      <div className="grid min-h-0 flex-1 grid-rows-3 gap-4 p-4 sm:grid-cols-3 sm:grid-rows-1 sm:gap-8 sm:p-8">
+        <div className="row-span-1 flex sm:col-span-2">
+          <Card className="flex flex-1 flex-col divide-y divide-gray-750">
+            <div className="flex flex-1 flex-col p-4">
+              <div className="flex flex-1 flex-col">
+                <div className="flex items-baseline justify-between">
+                  <h2 className="font-bold">Active Question</h2>
+                  <Button
+                    className="-m-2 !p-2"
+                    onClick={() => {
+                      plausible("Copied Embed URL", {
+                        props: {
+                          location: "activeQuestion",
+                        },
+                      });
+                      copyUrlToClipboard(`/embed/${sesh?.user?.id}`);
+                    }}
+                    variant="ghost"
+                  >
+                    <div className="flex items-center">
+                      <FaWindowRestore />
+                      &nbsp; Copy embed url
                     </div>
-                    <button
-                      className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
-                      onClick={() =>
-                        pinQuestion({
-                          questionId: q.id,
-                          location: "questionsList",
-                        })
-                      }
+                  </Button>
+                </div>
+                <AutoAnimate className="flex flex-1 items-center justify-center">
+                  {selectedQuestion ? (
+                    <span
+                      key={selectedQuestion?.id}
+                      className="max-w-md break-all text-lg font-medium"
                     >
-                      <span className="flex items-center gap-1.5">
-                        <FaEye />
-                        Show question
-                      </span>
-                    </button>
-                  </Card>
-                </li>
-              ))}
-            </AutoAnimate>
-          ) : (
-            <div className="flex flex-1 flex-col items-center justify-center p-2 text-gray-500">
-              <FaQuestionCircle size="80" />
-              <h3 className="mt-6 text-lg font-medium text-gray-400">
-                {"It's awfully quiet here..."}
-              </h3>
-              <p className="mt-1 text-sm ">
-                Share the Q&A link to get some questions
-              </p>
-              <div className="mt-6">
-                <Button
-                  variant="primary"
-                  onClick={() => {
+                      {selectedQuestion?.body}
+                    </span>
+                  ) : (
+                    <span className="text-sm font-medium text-gray-600">
+                      No active question
+                    </span>
+                  )}
+                </AutoAnimate>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 divide-x divide-gray-750">
+              <button
+                className="flex items-center justify-center gap-2 rounded-bl p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
+                onClick={() => unpinQuestion()}
+              >
+                <FaEyeSlash /> Hide
+              </button>
+              <button
+                className="flex items-center justify-center gap-2 rounded-br p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
+                onClick={() => {
+                  if (selectedQuestion)
+                    removeQuestion({
+                      questionId: selectedQuestion.id,
+                      location: "nextButton",
+                    });
+                  const next = otherQuestions[0]?.id;
+                  if (next)
+                    pinQuestion({ questionId: next, location: "nextButton" });
+                }}
+              >
+                <FaCaretSquareRight />
+                Next Question
+              </button>
+            </div>
+          </Card>
+        </div>
+        <div className="row-span-2 flex flex-col gap-2 sm:col-span-1 sm:row-span-1">
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-1.5 font-medium">
+              <span>Questions</span>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-extrabold">
+                {otherQuestions.length}
+              </span>
+              <button
+                className="relative z-10 -my-2 flex items-center gap-1.5 rounded py-2 px-2 text-sm hover:bg-gray-900/50 hover:text-white"
+                onClick={() => setReverseSort(!reverseSort)}
+              >
+                {reverseSort ? <FaSortAmountUp /> : <FaSortAmountDown />}
+              </button>
+            </h2>
+
+            <Dropdown
+              placement="bottom-end"
+              trigger={
+                <Button variant="secondary" size="base">
+                  <FaEllipsisV />
+                </Button>
+              }
+              items={[
+                {
+                  label: "Copy Q&A URL",
+                  onClick: () => {
                     plausible("Copied Q&A URL", {
                       props: {
-                        location: "questionsEmptyState",
+                        location: "questionsMenu",
                       },
                     });
                     copyUrlToClipboard(
                       `/ask/${sesh?.user?.name?.toLowerCase()}`
                     );
-                  }}
-                >
-                  Copy Q&A Link
-                </Button>
+                  },
+                },
+                {
+                  label: "Set up Chat Bot",
+                  onClick: () => {
+                    modalState[1](true);
+                  },
+                },
+              ]}
+            />
+          </div>
+          <AutoAnimate className="flex min-h-0 flex-1 flex-col rounded-lg bg-gray-950/25">
+            {otherQuestionsSorted.length > 0 ? (
+              <AutoAnimate
+                as="ul"
+                className="flex flex-col gap-2 overflow-y-auto p-2"
+              >
+                {otherQuestionsSorted.map((q) => (
+                  <li key={q.id}>
+                    <Card className="relative flex animate-fade-in-down flex-col gap-4 p-4">
+                      <div className="break-words">{q.body}</div>
+                      <div className="flex items-center justify-between text-gray-300">
+                        <div className="text-sm">
+                          {dayjs(q.createdAt).fromNow()}
+                        </div>
+                        <button
+                          className="relative z-10 -my-1 -mx-2 flex items-center gap-1.5 rounded py-1 px-2 text-sm hover:bg-gray-900/50"
+                          onClick={() =>
+                            removeQuestion({
+                              questionId: q.id,
+                              location: "questionsList",
+                            })
+                          }
+                        >
+                          <FaTrash />
+                          <span>Remove</span>
+                        </button>
+                      </div>
+                      <button
+                        className="absolute inset-0 z-0 flex items-center justify-center bg-gray-900/75 opacity-0 transition-opacity hover:opacity-100"
+                        onClick={() =>
+                          pinQuestion({
+                            questionId: q.id,
+                            location: "questionsList",
+                          })
+                        }
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <FaEye />
+                          Show question
+                        </span>
+                      </button>
+                    </Card>
+                  </li>
+                ))}
+              </AutoAnimate>
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center p-2 text-gray-500">
+                <FaQuestionCircle size="80" />
+                <h3 className="mt-6 text-lg font-medium text-gray-400">
+                  {"It's awfully quiet here..."}
+                </h3>
+                <p className="mt-1 text-sm ">
+                  Share the Q&A link to get some questions
+                </p>
+                <div className="mt-6">
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      plausible("Copied Q&A URL", {
+                        props: {
+                          location: "questionsEmptyState",
+                        },
+                      });
+                      copyUrlToClipboard(
+                        `/ask/${sesh?.user?.name?.toLowerCase()}`
+                      );
+                    }}
+                  >
+                    Copy Q&A Link
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </AutoAnimate>
+            )}
+          </AutoAnimate>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
