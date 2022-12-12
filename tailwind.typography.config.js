@@ -57,6 +57,9 @@ module.exports = (theme) => ({
           display: "none",
         },
       },
+      pre: {
+        backgroundColor: theme("colors.gray.900"),
+      },
       h2: {
         color: theme("colors.gray.300"),
       },
