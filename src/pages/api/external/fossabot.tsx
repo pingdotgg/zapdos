@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import input from "postcss/lib/input";
 import { pusherServerClient } from "../../../server/common/pusher";
 import { prisma } from "../../../server/db/client";
 
@@ -8,9 +7,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const channelName = req.headers["x-fossabot-channeldisplayname"] as string;
 
   if (!validateUrl || !channelName) {
-    res.status(400).json({
-      message: "Invalid request",
-    });
+    res.status(400).end("Invalid request");
     return;
   }
 
@@ -20,7 +17,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!user) {
-    res.status(400).json({ message: "User not found" });
+    res.status(400).end("User not found");
     return;
   }
 
@@ -28,9 +25,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const validateResponse = await fetch(validateUrl);
 
   if (validateResponse.status !== 200) {
-    res.status(400).json({
-      message: "Failed to validate request.",
-    });
+    res.status(400).end("Failed to validate request.");
     return;
   }
 
@@ -41,14 +36,21 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const messageDataResponse = await fetch(messageDataUrl);
 
   if (messageDataResponse.status !== 200) {
-    res.status(400).json({ message: "Failed to fetch message data" });
+    res.status(400).end("Failed to fetch message data");
     return;
   }
 
   const messageData = await messageDataResponse.json();
 
   // strip off the command, e.g. !ask
-  const question = messageData.message.content.match(/(?<=\s).*/)[0];
+  const [command, ...question] = messageData.message.content?.split(" ");
+
+  if (!question) {
+    res
+      .status(400)
+      .end(`No question provided NotLikeThis Try ${command} What day is it?`);
+    return;
+  }
 
   // insert question into database
   await prisma.question.create({
@@ -61,7 +63,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   // inform client of new question
   await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
-  res.status(200).end();
+  res.status(200).end("Question Added! SeemsGood");
 };
 
 export default handleRequest;
