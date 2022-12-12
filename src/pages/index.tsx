@@ -125,7 +125,7 @@ const QuestionsView = () => {
     <>
       <Modal openState={modalState}>
         <Card className="flex flex-col">
-          <div className="flex items-center justify-between border-b border-gray-700 py-2 px-4">
+          <div className="flex items-center justify-between border-b border-gray-750 py-2 px-4">
             <h3 className="font-medium">Connect a chatbot</h3>
             <Button variant="ghost" onClick={() => setShowModal(false)}>
               <FaTimes className="-mx-1.5 h-5 w-5" />
@@ -220,8 +220,8 @@ const QuestionsView = () => {
             <Dropdown
               placement="bottom-end"
               trigger={
-                <Button variant="secondary" size="base">
-                  <FaEllipsisV />
+                <Button variant="secondary">
+                  <FaEllipsisV className="-mx-1.5" />
                 </Button>
               }
               items={[
@@ -239,9 +239,9 @@ const QuestionsView = () => {
                   },
                 },
                 {
-                  label: "Connect Chat Bot",
+                  label: "Connect Chatbot",
                   onClick: () => {
-                    modalState[1](true);
+                    setShowModal(true);
                   },
                 },
               ]}

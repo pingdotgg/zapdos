@@ -8,7 +8,10 @@ const TABS = [
     label: "Fossabot",
     content: (
       <>
-        <p>Fossabot is our recommended bot (says Mark).</p>
+        <p>
+          Fossabot is our recommended bot (says Mark). Create a new command with
+          the following content:
+        </p>
         <pre>{`$(customapi https://ask.ping.gg/api/external/fossabot)`}</pre>
         <p>
           Messages sent to this command on your channel will be added to your
@@ -22,7 +25,7 @@ const TABS = [
     content: (
       <>
         <p>Fossabot is our recommended bot (says Mark).</p>
-        <pre>{`$(customapi https://ask.ping.gg/api/external/fossabot)`}</pre>
+        <pre>{`$(urlfetch https://ask.ping.gg/api/external/chatbots?q=$(querystring)&channel=$(channel)&user=$(user))`}</pre>
         <p>
           Messages sent to this command on your channel will be added to your
           question queue.
@@ -32,6 +35,23 @@ const TABS = [
   },
   {
     label: "StreamElements",
+    content: (
+      <>
+        <p>Fossabot is our recommended bot (says Mark).</p>
+        <pre>
+          {
+            "${urlfetch https://ask.ping.gg/api/external/chatbots?channel=${channel}&q=${queryescape ${1:}}&user=${user}}"
+          }
+        </pre>
+        <p>
+          Messages sent to this command on your channel will be added to your
+          question queue.
+        </p>
+      </>
+    ),
+  },
+  {
+    label: "Other",
     content: (
       <>
         <p>Fossabot is our recommended bot (says Mark).</p>
@@ -59,16 +79,15 @@ export const ChatbotWalkthrough: React.FC = () => {
         </p>
       </div>
       <Tab.Group>
-        <Tab.List className="border-b border-gray-700 px-2">
+        <Tab.List className="border-b border-gray-750 px-2">
           {TABS.map(({ label }) => (
             <Tab as={React.Fragment} key={label}>
               {({ selected }) => (
-                /* Use the `selected` state to conditionally style the selected tab. */
                 <Button
                   variant={selected ? "secondary" : "ghost"}
                   className={clsx(
-                    "-mb-px rounded-b-none border-b-0 ",
-                    selected ? "bg-gray-850" : "bg-transparent"
+                    "-mb-px rounded-b-none border-b-0",
+                    selected ? "border-gray-750 bg-gray-850" : "bg-transparent"
                   )}
                   key={label}
                 >
