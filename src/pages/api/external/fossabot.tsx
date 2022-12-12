@@ -48,7 +48,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!question) {
     res
       .status(400)
-      .end(`No question provided NotLikeThis Try ${command} What day is it?`);
+      .end(`No question provided NotLikeThis Try ${command} How do magnets work?`);
     return;
   }
 
