@@ -20,6 +20,7 @@ import {
   FaQuestionCircle,
   FaEye,
   FaEyeSlash,
+  FaEllipsisV,
 } from "react-icons/fa";
 
 import { getZapdosAuthSession } from "../server/common/get-server-session";
@@ -37,6 +38,7 @@ import {
   useSubscribeToEvent,
 } from "../utils/pusher";
 import { trpc } from "../utils/trpc";
+import Dropdown from "../components/dropdown";
 
 const QuestionsView = () => {
   const { data: sesh } = useSession();
@@ -195,23 +197,33 @@ const QuestionsView = () => {
             </button>
           </h2>
 
-          <Button
-            onClick={() => {
-              plausible("Copied Q&A URL", {
-                props: {
-                  location: "questionsMenu",
+          <Dropdown
+            placement="bottom-end"
+            trigger={
+              <Button variant="secondary" size="base">
+                <FaEllipsisV />
+              </Button>
+            }
+            items={[
+              {
+                label: "Copy Q&A URL",
+                onClick: () => {
+                  plausible("Copied Q&A URL", {
+                    props: {
+                      location: "questionsMenu",
+                    },
+                  });
+                  copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`);
                 },
-              });
-              copyUrlToClipboard(`/ask/${sesh?.user?.name?.toLowerCase()}`);
-            }}
-            variant="secondary"
-            size="base"
-          >
-            <div className="flex items-center">
-              <FaQuestionCircle />
-              &nbsp; Copy Q&A url
-            </div>
-          </Button>
+              },
+              {
+                label: "Set up Chat Bot",
+                onClick: () => {
+                  //open modal
+                },
+              },
+            ]}
+          />
         </div>
         <AutoAnimate className="flex min-h-0 flex-1 flex-col rounded-lg bg-gray-950/25">
           {otherQuestionsSorted.length > 0 ? (
