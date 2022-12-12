@@ -7,7 +7,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const channelName = req.headers["x-fossabot-channeldisplayname"] as string;
 
   if (!validateUrl || !channelName) {
-    res.status(400).end("Invalid request");
+    res.status(400).send("Invalid request");
     return;
   }
 
@@ -17,7 +17,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!user) {
-    res.status(400).end("User not found");
+    res.status(400).send("User not found");
     return;
   }
 
@@ -25,7 +25,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const validateResponse = await fetch(validateUrl);
 
   if (validateResponse.status !== 200) {
-    res.status(400).end("Failed to validate request.");
+    res.status(400).send("Failed to validate request.");
     return;
   }
 
@@ -36,7 +36,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const messageDataResponse = await fetch(messageDataUrl);
 
   if (messageDataResponse.status !== 200) {
-    res.status(400).end("Failed to fetch message data");
+    res.status(400).send("Failed to fetch message data");
     return;
   }
 
@@ -48,7 +48,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!question) {
     res
       .status(400)
-      .end(`No question provided NotLikeThis Try ${command} How do magnets work?`);
+      .send(`No question provided NotLikeThis Try ${command} How do magnets work?`);
     return;
   }
 
@@ -63,7 +63,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   // inform client of new question
   await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
-  res.status(200).end("Question Added! SeemsGood");
+  res.status(200).send("Question Added! SeemsGood");
 };
 
 export default handleRequest;
