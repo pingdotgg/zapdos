@@ -11,12 +11,12 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!question) {
       res
         .status(400)
-        .end(
+        .send(
           "No question provided NotLikeThis Make sure you include a question after the command."
         );
       return;
     }
-    res.status(400).end("Invalid request");
+    res.status(400).send("Invalid request");
     return;
   }
 
@@ -26,7 +26,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!user) {
-    res.status(400).end("User not found");
+    res.status(400).send("User not found");
     return;
   }
 
@@ -41,7 +41,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   // inform client of new question
   await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
-  res.status(200).end("Question Added! SeemsGood");
+  res.status(200).send("Question Added! SeemsGood");
 };
 
 export default handleRequest;
