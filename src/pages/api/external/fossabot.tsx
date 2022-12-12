@@ -46,7 +46,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     // strip off the command, e.g. !ask
     const [command, ...question] = messageData.message.content?.split(" ");
 
-    if (!question) {
+    if (!question || question.trim() === "") {
       res
         .status(400)
         .send(
