@@ -1,10 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 const colors = require("tailwindcss/colors");
+const typography = require("./tailwind.typography.config");
 
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      typography,
       colors: {
         gray: {
           ...colors.zinc,
@@ -66,5 +68,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };

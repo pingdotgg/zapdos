@@ -103,6 +103,7 @@ const QuestionsView = () => {
   };
 
   const modalState = useState(false);
+  const [showModal, setShowModal] = modalState;
 
   if (isLoading)
     return (
@@ -121,29 +122,26 @@ const QuestionsView = () => {
   return (
     <>
       <Modal openState={modalState}>
-        <Card>
-          <div className="flex flex-col p-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold">Chat Bots</h2>
-              <FaTimes
-                onClick={() => modalState[1](false)}
-                className="cursor-pointer"
-              />
-            </div>
-            <p className="text-sm text-gray-600">
-              Ping Ask currently supports integration with Fossabot, Nightbot,
-              and StreamElements. To use: Create a custom command on Fossabot
-              with the response
-              <pre>$(customapi https://ask.ping.gg/api/external/fossabot)</pre>
-              Any messages sent to this command on your channel will be added to
-              your question queue. Nightbot:
-              <pre>
-                $(urlfetch
-                https://ask.ping.gg/api/external/chatbots?q=$(querystring)&channel=$(channel)&user=$(user))
-              </pre>
-              StreamElements:
-              <pre></pre>
-            </p>
+        <Card className="flex flex-col">
+          <div className="flex items-center justify-between border-b border-gray-700 py-2 px-4">
+            <h3 className="font-medium">Connect a chatbot</h3>
+            <Button variant="ghost" onClick={() => setShowModal(false)}>
+              <FaTimes className="-mx-1.5 h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
+          <div className="prose prose-sm px-4 py-2">
+            Ping Ask currently supports Fossabot, Nightbot, and StreamElements.
+            To use: Create a custom command on Fossabot with the response
+            <pre>$(customapi https://ask.ping.gg/api/external/fossabot)</pre>
+            Any messages sent to this command on your channel will be added to
+            your question queue. Nightbot:
+            <pre>
+              $(urlfetch
+              https://ask.ping.gg/api/external/chatbots?q=$(querystring)&channel=$(channel)&user=$(user))
+            </pre>
+            StreamElements:
+            <pre></pre>
           </div>
         </Card>
       </Modal>
@@ -251,7 +249,7 @@ const QuestionsView = () => {
                   },
                 },
                 {
-                  label: "Set up Chat Bot",
+                  label: "Connect Chat Bot",
                   onClick: () => {
                     modalState[1](true);
                   },
