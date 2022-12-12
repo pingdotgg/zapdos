@@ -44,7 +44,8 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     const messageData = await messageDataResponse.json();
 
     // strip off the command, e.g. !ask
-    const [command, ...question] = messageData.message.content?.split(" ");
+    const [command, ...rest] = messageData.message.content?.split(" ");
+    const question = rest.join(" ");
 
     if (!question || question.trim() === "") {
       res
@@ -58,7 +59,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     // insert question into database
     await prisma.question.create({
       data: {
-        body: question.join(" "),
+        body: question,
         userId: user.id,
       },
     });
