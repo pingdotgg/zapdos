@@ -140,8 +140,8 @@ const QuestionsView = () => {
       <div className="grid min-h-0 flex-1 grid-rows-3 gap-4 p-4 sm:grid-cols-3 sm:grid-rows-1 sm:gap-8 sm:p-8">
         <div className="row-span-1 flex sm:col-span-2">
           <Card className="flex flex-1 flex-col divide-y divide-gray-750">
-            <div className="flex flex-1 flex-col p-4">
-              <div className="flex flex-1 flex-col">
+            <div className="flex min-h-0 flex-1 flex-col p-4">
+              <div className="flex min-h-0 flex-1 flex-col">
                 <div className="flex items-baseline justify-between">
                   <h2 className="font-bold">Active Question</h2>
                   <Button
@@ -162,20 +162,22 @@ const QuestionsView = () => {
                     </div>
                   </Button>
                 </div>
-                <AutoAnimate className="flex flex-1 items-center justify-center">
-                  {selectedQuestion ? (
-                    <span
-                      key={selectedQuestion?.id}
-                      className="max-w-md break-all text-lg font-medium"
-                    >
-                      {selectedQuestion?.body}
-                    </span>
-                  ) : (
-                    <span className="text-sm font-medium text-gray-600">
-                      No active question
-                    </span>
-                  )}
-                </AutoAnimate>
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  <AutoAnimate className="flex min-h-full items-center justify-center ">
+                    {selectedQuestion ? (
+                      <p
+                        key={selectedQuestion?.id}
+                        className="break-words font-medium sm:max-w-md sm:text-lg lg:max-w-[60%] xl:text-2xl"
+                      >
+                        {selectedQuestion?.body}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-600">
+                        No active question
+                      </p>
+                    )}
+                  </AutoAnimate>
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-2 divide-x divide-gray-750">
