@@ -45,6 +45,7 @@ import Dropdown from "../components/dropdown";
 import { Modal } from "../components/modal";
 import clsx from "clsx";
 import { ChatbotWalkthrough } from "../components/chatbot-walkthrough";
+import { ModalContainer, useConfirmationModal } from "../components/confirmation-modal";
 
 const QuestionsView = () => {
   const { data: sesh } = useSession();
@@ -120,7 +121,15 @@ const QuestionsView = () => {
   };
 
   const modalState = useState(false);
-  const [showModal, setShowModal] = modalState;
+  const [, setShowModal] = modalState;
+
+  const showClearConfirmationModal = useConfirmationModal({
+    title: "Clear all questions?",
+    icon: <FaTrash />,
+    variant: "danger",
+    description: "This will remove all questions from the queue. This cannot be undone.",
+    onConfirm: () => clearQuestions({location: "questionsMenu"}),
+  })
 
   if (isLoading)
     return (
@@ -292,8 +301,9 @@ const QuestionsView = () => {
                     </>
                   ),
                   onClick: () => {
-                    clearQuestions({location: "questionsMenu"})
+                    showClearConfirmationModal()
                   },
+                  disabled: otherQuestions.length === 0,
                 },
               ]}
             />
