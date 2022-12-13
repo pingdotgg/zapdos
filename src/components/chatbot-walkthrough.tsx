@@ -9,13 +9,14 @@ const TABS = [
     content: (
       <>
         <p>
-          Fossabot is our recommended bot (says Mark). Create a new command with
-          the following content:
+          To connect Fossabot, create a new command with the following{" "}
+          <strong>Response</strong> and set the <strong>Response Type</strong>{" "}
+          to <kbd>Reply</kbd>.
         </p>
         <pre>{`$(customapi https://ask.ping.gg/api/external/fossabot)`}</pre>
         <p>
-          Messages sent to this command on your channel will be added to your
-          question queue.
+          Messages sent to this command on your channel will automagically be
+          added to your questions ✨
         </p>
       </>
     ),
@@ -24,11 +25,14 @@ const TABS = [
     label: "Nightbot",
     content: (
       <>
-        <p>Fossabot is our recommended bot (says Mark).</p>
-        <pre>{`$(urlfetch https://ask.ping.gg/api/external/chatbots?q=$(querystring)&channel=$(channel)&user=$(user))`}</pre>
         <p>
-          Messages sent to this command on your channel will be added to your
-          question queue.
+          To connect Nightbot, create a new command with the following{" "}
+          <strong>Message</strong>.
+        </p>
+        <pre>{`@$(user) $(urlfetch https://ask.ping.gg/api/external/chatbots?q=$(querystring)&channel=$(channel)&user=$(user))`}</pre>
+        <p>
+          Messages sent to this command on your channel will automagically be
+          added to your questions ✨
         </p>
       </>
     ),
@@ -37,15 +41,18 @@ const TABS = [
     label: "StreamElements",
     content: (
       <>
-        <p>Fossabot is our recommended bot (says Mark).</p>
+        <p>
+          To connect StreamElements, create a new command with the following{" "}
+          <strong>Response</strong>.
+        </p>
         <pre>
           {
-            "${urlfetch https://ask.ping.gg/api/external/chatbots?channel=${channel}&q=${queryescape ${1:}}&user=${user}}"
+            "@${user} ${urlfetch https://ask.ping.gg/api/external/chatbots?channel=${channel}&q=${queryescape ${1:}}&user=${user}}"
           }
         </pre>
         <p>
-          Messages sent to this command on your channel will be added to your
-          question queue.
+          Messages sent to this command on your channel will automagically be
+          added to your questions ✨
         </p>
       </>
     ),
@@ -54,11 +61,47 @@ const TABS = [
     label: "Other",
     content: (
       <>
-        <p>Fossabot is our recommended bot (says Mark).</p>
-        <pre>{`$(customapi https://ask.ping.gg/api/external/fossabot)`}</pre>
         <p>
-          Messages sent to this command on your channel will be added to your
-          question queue.
+          If your chatbot supports it, you can try configuring it to make an
+          HTTP GET request to <code>ask.ping.gg/api/external/chatbots</code>{" "}
+          with the following query parameters.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>q</code>
+              </td>
+              <td>The question content to be submitted.</td>
+            </tr>
+            <tr>
+              <td>
+                <code>channel</code>
+              </td>
+              <td>
+                The Twitch channel (username) where the question is being asked.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>user</code>
+              </td>
+              <td>The username of the Twitch user submitting the question.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          If you&apos;re having trouble configuring your chatbot, hit us up on{" "}
+          <a href="https://ping.gg/discord" target="_blank" rel="noreferrer">
+            Discord
+          </a>{" "}
+          and we&apos;ll do our best to help you get set up 🚀
         </p>
       </>
     ),
@@ -75,7 +118,31 @@ export const ChatbotWalkthrough: React.FC = () => {
           <code>{"!ask How do magnets work?"}</code>.
         </p>
         <p>
-          Ping Ask currently supports Fossabot, Nightbot, and StreamElements.
+          Ping Ask officially supports{" "}
+          <a
+            href="https://fossabot.com/?ref=ping-gg"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Fossabot
+          </a>
+          ,{" "}
+          <a
+            href="https://nightbot.tv/?ref=ping-gg"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Nightbot
+          </a>
+          , and{" "}
+          <a
+            href="https://streamelements.com/features/chatbot?ref=ping-gg"
+            target="_blank"
+            rel="noreferrer"
+          >
+            StreamElements
+          </a>
+          .
         </p>
       </div>
       <Tab.Group>
