@@ -76,6 +76,16 @@ export const newQuestionRouter = t.router({
       });
     }),
 
+  archiveAll: protectedProcedure
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.question.updateMany({
+        where: { userId: ctx.session.user.id, status: "PENDING" },
+        data: {
+          status: "ANSWERED",
+        },
+      });
+    }),
+
   unpin: protectedProcedure.mutation(async ({ ctx }) => {
     await pusherServerClient.trigger(
       `user-${ctx.session.user?.id}`,

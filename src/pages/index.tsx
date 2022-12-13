@@ -84,6 +84,19 @@ const QuestionsView = () => {
       },
     });
 
+  const { mutate: clearQuestionsMutation } =
+    trpc.proxy.questions.archiveAll.useMutation({
+      onMutate: () => {
+        // Optimistic update
+        tctx.queryClient.setQueryData(["questions.getAll", null], []);
+      },
+    });
+  
+  const clearQuestions = async ({location}: {location:string}) => {
+    await clearQuestionsMutation();
+    plausible("Clear Questions", { props: { location } });
+  };
+
   const removeQuestion = async ({
     questionId,
     location,
@@ -269,6 +282,17 @@ const QuestionsView = () => {
                   ),
                   onClick: () => {
                     setShowModal(true);
+                  },
+                },
+                {
+                  label: (
+                    <>
+                      <FaTrash className="mr-2" />
+                      Clear Question Queue
+                    </>
+                  ),
+                  onClick: () => {
+                    clearQuestions({location: "questionsMenu"})
                   },
                 },
               ]}
