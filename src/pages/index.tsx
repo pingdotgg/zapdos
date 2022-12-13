@@ -128,9 +128,7 @@ const QuestionsView = () => {
                         location: "activeQuestion",
                       },
                     });
-                    copyUrlToClipboard(
-                      `/embed/${sesh?.user?.name?.toLowerCase()}`
-                    );
+                    copyUrlToClipboard(`/embed/${sesh?.user?.id}`);
                   }}
                   variant="ghost"
                 >
@@ -310,7 +308,7 @@ const LazyQuestionsView = dynamic(() => Promise.resolve(QuestionsViewWrapper), {
   ssr: false,
 });
 
-const copyUrlToClipboard = (path: string) => () => {
+const copyUrlToClipboard = (path: string) => {
   if (!process.browser) return;
   navigator.clipboard.writeText(`${window.location.origin}${path}`);
 };
@@ -412,6 +410,14 @@ const Home: NextPage = () => {
             </a>
           </span>
           <div className="flex gap-4">
+            <a
+              href="https://discord.gg/qQuFcZKJj3"
+              className="font-bold text-pink-300 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Feedback
+            </a>
             <a
               href="https://github.com/t3-oss/zapdos"
               className="font-bold text-pink-300 hover:underline"
