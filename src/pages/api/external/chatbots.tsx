@@ -8,9 +8,15 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   // const askerName = req.query["user"] as string;
 
   if (!question || !channelName) {
-    res.status(400).json({
-      message: "Invalid request",
-    });
+    if (!question) {
+      res
+        .status(400)
+        .send(
+          "No question provided NotLikeThis Make sure you include a question after the command."
+        );
+      return;
+    }
+    res.status(400).send("Invalid request");
     return;
   }
 
@@ -20,7 +26,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!user) {
-    res.status(400).json({ message: "User not found" });
+    res.status(400).send("User not found");
     return;
   }
 
@@ -35,7 +41,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   // inform client of new question
   await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
-  res.status(200).end();
+  res.status(200).send("Question Added! SeemsGood");
 };
 
 export default handleRequest;
