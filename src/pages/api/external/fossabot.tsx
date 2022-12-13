@@ -51,7 +51,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
       res
         .status(400)
         .send(
-          `No question provided NotLikeThis Try ${command} How do magnets work?`
+          `No question provided NotLikeThis Try "${command} How do magnets work?"`
         );
       return;
     }

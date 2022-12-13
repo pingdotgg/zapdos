@@ -6,17 +6,17 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const channelName = req.query["channel"] as string;
   const question = req.query["q"] as string;
   // const askerName = req.query["user"] as string;
+  if (!question) {
+    res
+      .status(200)
+      .send(
+        "No question provided NotLikeThis Make sure you include a question after the command."
+      );
+    return;
+  }
 
-  if (!question || !channelName) {
-    if (!question) {
-      res
-        .status(400)
-        .send(
-          "No question provided NotLikeThis Make sure you include a question after the command."
-        );
-      return;
-    }
-    res.status(400).send("Invalid request");
+  if (!channelName) {
+    res.status(200).send("Channel name missing, check your bot configuration.");
     return;
   }
 
@@ -26,7 +26,11 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!user) {
-    res.status(400).send("User not found");
+    res
+      .status(200)
+      .send(
+        `Channel ${channelName} not found, does it match your Ping Ask account?`
+      );
     return;
   }
 
