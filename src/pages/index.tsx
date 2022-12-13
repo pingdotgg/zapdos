@@ -22,6 +22,8 @@ import {
   FaEyeSlash,
   FaEllipsisV,
   FaTimes,
+  FaLink,
+  FaPlug,
 } from "react-icons/fa";
 
 import { getZapdosAuthSession } from "../server/common/get-server-session";
@@ -226,7 +228,12 @@ const QuestionsView = () => {
               }
               items={[
                 {
-                  label: "Copy Q&A URL",
+                  label: (
+                    <>
+                      <FaLink className="mr-2" />
+                      Copy Q&A URL
+                    </>
+                  ),
                   onClick: () => {
                     plausible("Copied Q&A URL", {
                       props: {
@@ -239,7 +246,12 @@ const QuestionsView = () => {
                   },
                 },
                 {
-                  label: "Connect Chatbot",
+                  label: (
+                    <>
+                      <FaPlug className="mr-2" />
+                      Connect Chatbot
+                    </>
+                  ),
                   onClick: () => {
                     setShowModal(true);
                   },
