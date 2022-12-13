@@ -2,13 +2,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { pusherServerClient } from "../../../server/common/pusher";
 import { prisma } from "../../../server/db/client";
 
+export const PREFIX = "[Ping Ask] "
+
 const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const validateUrl = req.headers["x-fossabot-validateurl"] as string;
   const channelName = req.headers["x-fossabot-channeldisplayname"] as string;
 
   try {
     if (!validateUrl || !channelName) {
-      res.status(400).send("Invalid request");
+      res.status(400).send(`${PREFIX}Invalid request`);
       return;
     }
 
@@ -18,7 +20,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     if (!user) {
-      res.status(400).send("User not found");
+      res.status(400).send(`${PREFIX}User not found`);
       return;
     }
 
@@ -26,7 +28,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     const validateResponse = await fetch(validateUrl);
 
     if (validateResponse.status !== 200) {
-      res.status(400).send("Failed to validate request.");
+      res.status(400).send(`${PREFIX}Failed to validate request.`);
       return;
     }
 
@@ -37,7 +39,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     const messageDataResponse = await fetch(messageDataUrl);
 
     if (messageDataResponse.status !== 200) {
-      res.status(400).send("Failed to fetch message data");
+      res.status(400).send(`${PREFIX}Failed to fetch message data`);
       return;
     }
 
@@ -51,7 +53,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
       res
         .status(400)
         .send(
-          `No question provided NotLikeThis Try ${command} How do magnets work?`
+          `${PREFIX}No question provided NotLikeThis Try "${command} How do magnets work?"`
         );
       return;
     }
@@ -67,10 +69,10 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
     // inform client of new question
     await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
-    res.status(200).send("Question Added! SeemsGood");
+    res.status(200).send(`${PREFIX}Question Added! SeemsGood`);
   } catch (e) {
     console.log(e);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send(`${PREFIX}Internal Server Error`);
   }
 };
 
