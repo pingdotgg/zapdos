@@ -180,7 +180,20 @@ const QuestionsView = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 divide-x divide-gray-750">
+            <div className="grid grid-cols-3 divide-x divide-gray-750">
+              <button
+                className="flex items-center justify-center gap-2 rounded-bl p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
+                onClick={() => {
+                  if (selectedQuestion)
+                    removeQuestion({
+                      questionId: selectedQuestion.id,
+                      location: "doneButton",
+                    });
+                  unpinQuestion();
+                }}
+              >
+                <FaTrash /> Done
+              </button>
               <button
                 className="flex items-center justify-center gap-2 rounded-bl p-3 text-sm hover:bg-gray-700 sm:p-4 sm:text-base"
                 onClick={() => unpinQuestion()}
@@ -201,7 +214,7 @@ const QuestionsView = () => {
                 }}
               >
                 <FaCaretSquareRight />
-                Next Question
+                Next
               </button>
             </div>
           </Card>
