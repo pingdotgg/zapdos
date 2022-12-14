@@ -43,9 +43,8 @@ import {
 import { trpc } from "../utils/trpc";
 import Dropdown from "../components/dropdown";
 import { Modal } from "../components/modal";
-import clsx from "clsx";
 import { ChatbotWalkthrough } from "../components/chatbot-walkthrough";
-import { ModalContainer, useConfirmationModal } from "../components/confirmation-modal";
+import { useConfirmationModal } from "../components/confirmation-modal";
 
 const QuestionsView = () => {
   const { data: sesh } = useSession();
@@ -124,11 +123,12 @@ const QuestionsView = () => {
   const [, setShowModal] = modalState;
 
   const showClearConfirmationModal = useConfirmationModal({
-    title: "Clear all questions?",
+    title: "Remove all questions?",
     icon: <FaTrash />,
     variant: "danger",
     description: "This will remove all questions from the queue. This cannot be undone.",
     onConfirm: () => clearQuestions({location: "questionsMenu"}),
+    confirmationLabel: "Remove all",
   })
 
   if (isLoading)
@@ -297,7 +297,7 @@ const QuestionsView = () => {
                   label: (
                     <>
                       <FaTrash className="mr-2" />
-                      Clear Question Queue
+                      Clear Questions
                     </>
                   ),
                   onClick: () => {
