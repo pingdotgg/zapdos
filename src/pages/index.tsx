@@ -43,8 +43,8 @@ import {
 import { trpc } from "../utils/trpc";
 import Dropdown from "../components/dropdown";
 import { Modal } from "../components/modal";
-import clsx from "clsx";
 import { ChatbotWalkthrough } from "../components/chatbot-walkthrough";
+import { useConfirmationModal } from "../components/confirmation-modal";
 
 const QuestionsView = () => {
   const { data: sesh } = useSession();
@@ -84,6 +84,19 @@ const QuestionsView = () => {
       },
     });
 
+  const { mutate: clearQuestionsMutation } =
+    trpc.proxy.questions.archiveAll.useMutation({
+      onMutate: () => {
+        // Optimistic update
+        tctx.queryClient.setQueryData(["questions.getAll", null], []);
+      },
+    });
+  
+  const clearQuestions = async ({location}: {location:string}) => {
+    await clearQuestionsMutation();
+    plausible("Clear Questions", { props: { location } });
+  };
+
   const removeQuestion = async ({
     questionId,
     location,
@@ -107,7 +120,16 @@ const QuestionsView = () => {
   };
 
   const modalState = useState(false);
-  const [showModal, setShowModal] = modalState;
+  const [, setShowModal] = modalState;
+
+  const showClearConfirmationModal = useConfirmationModal({
+    title: "Remove all questions?",
+    icon: <FaTrash />,
+    variant: "danger",
+    description: "This will remove all questions from the queue. This cannot be undone.",
+    onConfirm: () => clearQuestions({location: "questionsMenu"}),
+    confirmationLabel: "Remove all",
+  })
 
   if (isLoading)
     return (
@@ -270,6 +292,18 @@ const QuestionsView = () => {
                   onClick: () => {
                     setShowModal(true);
                   },
+                },
+                {
+                  label: (
+                    <>
+                      <FaTrash className="mr-2" />
+                      Clear Questions
+                    </>
+                  ),
+                  onClick: () => {
+                    showClearConfirmationModal()
+                  },
+                  disabled: otherQuestions.length === 0,
                 },
               ]}
             />
