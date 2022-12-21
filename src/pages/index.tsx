@@ -412,9 +412,20 @@ const copyUrlToClipboard = (path: string) => {
 const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: sesh } = useSession();
 
+  const { data: moderatedChannels } = trpc.proxy.user.getModeratedChannels.useQuery()
+
+  const channelSelector = moderatedChannels?.map((c)=> ({label: c.name, onClick: ()=>{
+    location.assign(`/mod/${c.name}`)
+  }})) ?? [{label: "No channels"}]
+
   return (
     <div className="flex gap-6">
-      <h1 className="flex items-center gap-2 text-base font-medium">
+
+      <Dropdown
+              placement="bottom-end"
+              trigger={
+                <Button variant="ghost">
+                <h1 className="flex items-center gap-2 text-base font-medium">
         {sesh?.user?.image && (
           <img
             src={sesh?.user?.image}
@@ -424,6 +435,16 @@ const NavButtons: React.FC<{ userId: string }> = ({ userId }) => {
         )}
         <span className="sr-only sm:not-sr-only">{sesh?.user?.name}</span>
       </h1>
+      </Button>
+              }
+              items={channelSelector}
+            />
+      
+
+      
+
+      
+        
 
       <Button onClick={() => signOut()} variant="secondary" size="lg">
         <div className="flex items-center">

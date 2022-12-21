@@ -1,9 +1,12 @@
 // src/server/router/index.ts
-import { newQuestionRouter } from "./subroutes/question";
 import { t } from "./trpc";
+
+import { newQuestionRouter } from "./subroutes/question";
+import { userRouter } from "./subroutes/user";
 
 export const appRouter = t.router({
   questions: newQuestionRouter,
+  user: userRouter
 });
 
 // export type definition of API
