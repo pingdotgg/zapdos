@@ -6,9 +6,9 @@ generator client {
 }
 
 datasource db {
-    provider = "postgres"
-    // url      = "file:./db.sqlite"
-    url      = env("DATABASE_URL")
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
 enum QuestionStatus {
@@ -26,6 +26,8 @@ model Question {
     status QuestionStatus @default(PENDING)
 
     createdAt DateTime @default(now())
+
+    @@index([userId])
 }
 
 // Necessary for Next auth
@@ -35,16 +37,17 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?
-    access_token      String?
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
-    scope             String?
-    id_token          String?
-    session_state     String?
+    scope             String? @db.Text
+    id_token          String? @db.Text
+    session_state     String? @db.Text
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
@@ -53,6 +56,8 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
 model User {

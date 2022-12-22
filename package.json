@@ -12,8 +12,8 @@
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@headlessui/react": "^1.7.5",
-    "@next-auth/prisma-adapter": "^1.0.3",
-    "@prisma/client": "^4.0.0",
+    "@next-auth/prisma-adapter": "^1.0.5",
+    "@prisma/client": "^4.8.0",
     "@tailwindcss/typography": "^0.5.8",
     "@trpc/client": "^10.0.0-alpha.37",
     "@trpc/next": "^10.0.0-alpha.37",
@@ -21,8 +21,8 @@
     "@trpc/server": "^10.0.0-alpha.37",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.3",
-    "next": "12.2.1",
-    "next-auth": "^4.10.0",
+    "next": "12.2.5",
+    "next-auth": "^4.18.7",
     "next-plausible": "^3.6.3",
     "pusher": "^5.1.1-beta",
     "pusher-js": "^7.1.1-beta",
@@ -48,7 +48,7 @@
     "postcss": "^8.4.14",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.12",
-    "prisma": "^4.0.0",
+    "prisma": "^4.8.0",
     "tailwindcss": "^3.1.6",
     "typescript": "4.7.4"
   }
