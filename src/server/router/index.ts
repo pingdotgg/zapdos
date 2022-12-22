@@ -6,7 +6,7 @@ import { userRouter } from "./subroutes/user";
 
 export const appRouter = t.router({
   questions: newQuestionRouter,
-  user: userRouter
+  user: userRouter,
 });
 
 // export type definition of API

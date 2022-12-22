@@ -65,6 +65,8 @@ model User {
     sessions      Session[]
 
     Question Question[]
+
+    ModList String[]
 }
 
 model VerificationToken {
