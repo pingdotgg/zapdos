@@ -6,6 +6,7 @@ import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import PlausibleProvider from "next-plausible";
+import { ModalContainer } from "../components/confirmation-modal";
 
 const MyApp: AppType = ({
   Component,
@@ -14,6 +15,7 @@ const MyApp: AppType = ({
   return (
     <PlausibleProvider domain="ask.ping.gg">
       <SessionProvider session={session}>
+        <ModalContainer/>
         <Component {...pageProps} />
       </SessionProvider>
     </PlausibleProvider>

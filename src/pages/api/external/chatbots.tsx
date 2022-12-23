@@ -1,16 +1,23 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { pusherServerClient } from "../../../server/common/pusher";
 import { prisma } from "../../../server/db/client";
+import { PREFIX } from "./fossabot";
 
 const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   const channelName = req.query["channel"] as string;
   const question = req.query["q"] as string;
   // const askerName = req.query["user"] as string;
+  if (!question) {
+    res
+      .status(200)
+      .send(
+        `${PREFIX}No question provided NotLikeThis Make sure you include a question after the command.`
+      );
+    return;
+  }
 
-  if (!question || !channelName) {
-    res.status(400).json({
-      message: "Invalid request",
-    });
+  if (!channelName) {
+    res.status(200).send(`${PREFIX}Channel name missing, check your bot configuration.`);
     return;
   }
 
@@ -20,7 +27,11 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!user) {
-    res.status(400).json({ message: "User not found" });
+    res
+      .status(200)
+      .send(
+        `${PREFIX}Channel ${channelName} not found, does it match your Ping Ask account?`
+      );
     return;
   }
 
@@ -35,7 +46,7 @@ const handleRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   // inform client of new question
   await pusherServerClient.trigger(`user-${user.id}`, "new-question", {});
 
-  res.status(200).end();
+  res.status(200).send(`${PREFIX}Question Added! SeemsGood`);
 };
 
 export default handleRequest;

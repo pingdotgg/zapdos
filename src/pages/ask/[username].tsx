@@ -87,7 +87,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const twitchName = params.username.toLowerCase();
 
   const userInfo = await prisma.user.findFirst({
-    where: { name: { equals: twitchName, mode: "insensitive" } },
+    where: { name: { equals: twitchName } },
   });
 
   if (!userInfo) {
