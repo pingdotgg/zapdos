@@ -95,17 +95,24 @@ export const newQuestionRouter = t.router({
       });
     }),
 
-  archiveAll: protectedProcedure
-    .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.question.updateMany({
-        where: { userId: ctx.session.user.id, status: "PENDING" },
-        data: {
-          status: "ANSWERED",
-        },
-      });
-    }),
+  archiveAll: protectedProcedure.mutation(async ({ ctx, input }) => {
+    return await ctx.prisma.question.updateMany({
+      where: { userId: ctx.session.user.id, status: "PENDING" },
+      data: {
+        status: "ANSWERED",
+      },
+    });
+  }),
 
   unpin: protectedProcedure.mutation(async ({ ctx }) => {
+    // set pinned question to pending
+    await ctx.prisma.question.updateMany({
+      where: { userId: ctx.session.user.id, status: "PINNED" },
+      data: {
+        status: "PENDING",
+      },
+    });
+
     await pusherServerClient.trigger(
       `user-${ctx.session.user?.id}`,
       "question-unpinned",
