@@ -82,6 +82,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (!params || !params.username || typeof params.username !== "string") {
     return {
       notFound: true,
+      revalidate: 60,
     };
   }
   const twitchName = params.username.toLowerCase();
@@ -93,6 +94,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (!userInfo) {
     return {
       notFound: true,
+      revalidate: 60,
     };
   }
 
